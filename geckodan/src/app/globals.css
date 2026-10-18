@@ -538,10 +538,10 @@ textarea {
 
 .hero {
   position: relative;
-  min-height: max(640px, 100svh);
+  min-height: max(600px, 88svh);
   display: grid;
   overflow: hidden;
-  background: var(--night);
+  background: #07140d;
   color: var(--on-night);
   isolation: isolate;
 }
@@ -568,8 +568,8 @@ textarea {
   inset: 0;
   z-index: 1;
   background:
-    linear-gradient(90deg, var(--night) 0%, rgba(7, 13, 5, 0.65) 22%, rgba(7, 13, 5, 0) 52%), /* taste-skill-ignore: hero photo scrim */
-    linear-gradient(0deg, rgba(7, 13, 5, 0.85) 0%, rgba(7, 13, 5, 0) 26%); /* taste-skill-ignore: hero photo scrim */
+    linear-gradient(90deg, #07140d 0%, rgba(7, 20, 13, 0.65) 22%, rgba(7, 20, 13, 0) 52%), /* taste-skill-ignore: hero photo scrim */
+    linear-gradient(0deg, #07140d 0%, rgba(7, 20, 13, 0.7) 14%, rgba(7, 20, 13, 0) 38%); /* taste-skill-ignore: hero photo scrim */
 }
 
 .hero__inner {
@@ -652,7 +652,7 @@ textarea {
     order: -1;
   }
   .hero__media::before {
-    background: linear-gradient(0deg, var(--night) 0%, rgba(7, 13, 5, 0) 45%); /* taste-skill-ignore: hero photo scrim */
+    background: linear-gradient(0deg, #07140d 0%, rgba(7, 20, 13, 0) 45%); /* taste-skill-ignore: hero photo scrim */
   }
   .hero__inner {
     padding-top: 0;
@@ -1652,22 +1652,27 @@ textarea {
 /* ---------- Footer ---------- */
 
 .site-footer {
-  background: #000503;
+  background: #050e09;
   color: var(--on-night);
 }
 
-.site-footer__bar {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px 32px;
-  width: min(1240px, 100% - 2 * var(--margin));
+.site-footer__inner {
+  display: grid;
+  grid-template-columns: minmax(0, 4fr) repeat(3, minmax(0, 2.4fr));
+  gap: 2.5rem clamp(1.5rem, 4vw, 4rem);
+  width: min(var(--max), 100% - 2 * var(--margin));
   margin-inline: auto;
-  padding-block: 20px;
+  padding-block: clamp(3rem, 6vw, 5rem) 2rem;
 }
 
 .site-footer__brand {
+  display: grid;
+  gap: 14px;
+  align-content: start;
+  justify-items: start;
+}
+
+.site-footer__logo {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -1676,28 +1681,80 @@ textarea {
   text-decoration: none;
 }
 
-.site-footer__tag {
-  font-size: 0.75rem;
+.site-footer__tag,
+.site-footer address {
+  font-size: 0.875rem;
+  font-style: normal;
+  line-height: 1.6;
   color: var(--on-night-soft);
+}
+
+.site-footer h2 {
+  margin-bottom: 10px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--gold);
 }
 
 .site-footer ul {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px 20px;
+  display: grid;
+  gap: 0;
 }
 
-.site-footer ul a {
+.site-footer ul a,
+.site-footer__brand a:not(.site-footer__logo) {
   display: inline-flex;
   align-items: center;
-  min-height: 44px;
-  font-size: 0.75rem;
+  gap: 8px;
+  min-height: 40px;
+  font-size: 0.9375rem;
   text-decoration: none;
+  color: var(--on-night-soft);
+  transition: color 160ms ease;
+}
+
+.site-footer svg {
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
+}
+
+.site-footer ul a:hover,
+.site-footer__brand a:not(.site-footer__logo):hover {
+  color: var(--on-night);
+}
+
+.site-footer__legal {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.5rem 1.5rem;
+  width: min(var(--max), 100% - 2 * var(--margin));
+  margin-inline: auto;
+  padding-block: 1.25rem 2rem;
+  font-size: 0.8125rem;
   color: var(--on-night-soft);
 }
 
-.site-footer ul a:hover {
-  color: var(--on-night);
+.site-footer__legal a {
+  color: inherit;
+}
+
+@media (max-width: 900px) {
+  .site-footer__inner {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .site-footer__brand {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 520px) {
+  .site-footer__inner {
+    grid-template-columns: 1fr;
+  }
 }
 
 
@@ -1740,7 +1797,14 @@ textarea {
     animation-delay: 320ms;
   }
   .hero__media img {
-    animation: hero-drift 2400ms var(--ease-out) both;
+    animation:
+      hero-drift 2400ms var(--ease-out) both,
+      hero-breathe 36s ease-in-out 2400ms infinite alternate;
+  }
+  @keyframes hero-breathe {
+    to {
+      transform: scale(1.035);
+    }
   }
   @keyframes hero-in {
     from {
@@ -1753,6 +1817,26 @@ textarea {
       opacity: 0;
       transform: scale(1.06);
     }
+  }
+}
+
+/* ---------- Page transitions: a short cross-fade between routes ---------- */
+
+@view-transition {
+  navigation: auto;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 180ms;
+  animation-timing-function: cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
   }
 }
 

@@ -14,9 +14,9 @@ export function GeckoCard({ gecko, showStatus = true }: { gecko: GeckoWithRelati
         <GeckoImage photo={gecko.photos[0]} name={gecko.name} sizes="(max-width: 700px) 100vw, (max-width: 1200px) 50vw, 33vw" />
       </Link>
       <div>
-        <h3 className="gecko-card__name">
+        <h2 className="gecko-card__name">
           <Link href={href}>{gecko.name}</Link>
-        </h3>
+        </h2>
         <p className="gecko-card__meta">
           <span>ID {gecko.code}</span>
           {gecko.morph ? <span>{gecko.morph}</span> : null}
