@@ -63,6 +63,34 @@ export default async function HomePage() {
 
       {/* One continuous page: the ground shifts tone slowly instead of switching between banded slides. */}
       <div className="flow">
+        {/* Signature lines: one composition, three identities */}
+        <section className="lines" aria-labelledby="lines-title">
+          <div className="wrap">
+            <header className="lines__head">
+              <h2 id="lines-title" className="display-3">
+                Signature Lines
+              </h2>
+              <p className="lines__title">Three distinct bloodlines, one standard.</p>
+            </header>
+            {lines.state === 'ok' ? (
+              <LineIndex
+                lines={lines.data.map((l) => ({
+                  slug: l.slug,
+                  name: l.name,
+                  tagline: l.tagline,
+                  summary: l.description ? excerpt(l.description, 200) : null,
+                  coverSrc: mediaUrl(l.cover_photo_path),
+                  coverAlt: l.cover_photo_alt || `${l.name} line`,
+                }))}
+              />
+            ) : lines.state === 'unconfigured' ? (
+              <UnconfiguredNotice />
+            ) : (
+              <ErrorNotice />
+            )}
+          </div>
+        </section>
+
         {/* Featured geckos: a practical catalog grid */}
         <section className="catalog" aria-labelledby="featured-title">
           <Leaves side="left" />
@@ -126,33 +154,6 @@ export default async function HomePage() {
                   )
                 })}
               </ul>
-            )}
-          </div>
-        </section>
-
-        {/* Signature lines: one composition, three identities */}
-        <section className="lines" aria-labelledby="lines-title">
-          <div className="wrap">
-            <header className="lines__head">
-              <h2 id="lines-title" className="display-3">
-                Signature Lines
-              </h2>
-              <p className="lines__title">Three distinct bloodlines, one standard.</p>
-            </header>
-            {lines.state === 'ok' ? (
-              <LineIndex
-                lines={lines.data.map((l) => ({
-                  slug: l.slug,
-                  name: l.name,
-                  tagline: l.tagline,
-                  coverSrc: mediaUrl(l.cover_photo_path),
-                  coverAlt: l.cover_photo_alt || `${l.name} line`,
-                }))}
-              />
-            ) : lines.state === 'unconfigured' ? (
-              <UnconfiguredNotice />
-            ) : (
-              <ErrorNotice />
             )}
           </div>
         </section>

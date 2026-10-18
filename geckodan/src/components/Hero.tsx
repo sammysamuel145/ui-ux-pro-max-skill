@@ -27,9 +27,9 @@ export function Hero({ settings }: { settings: SiteSettings }) {
     <section className="hero" aria-labelledby="hero-title">
       <div className="hero__media">
         {uploaded ? (
-          <Image src={uploaded} alt={alt} fill preload sizes="(max-width: 760px) 100vw, 72vw" style={{ objectFit: 'cover' }} />
+          <Image src={uploaded} alt={alt} fill preload sizes="(max-width: 900px) 100vw, 72vw" style={{ objectFit: 'cover' }} />
         ) : (
-          <Image src={conceptImage} alt={alt} fill preload placeholder="blur" sizes="(max-width: 760px) 100vw, 72vw" style={{ objectFit: 'cover', objectPosition: '40% 50%' }} />
+          <Image src={conceptImage} alt={alt} fill preload placeholder="blur" sizes="(max-width: 900px) 100vw, 72vw" style={{ objectFit: 'cover', objectPosition: 'var(--hero-pos, 40% 50%)' }} />
         )}
       </div>
       <div className="wrap hero__inner">
