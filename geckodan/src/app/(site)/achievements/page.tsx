@@ -9,7 +9,7 @@ export const revalidate = 60
 
 export const metadata: Metadata = {
   title: 'Achievements',
-  description: 'Prestasi kompetisi GeckoDan yang sudah diverifikasi, lengkap dengan buktinya.',
+  description: 'Verified GeckoDan competition achievements, with supporting evidence.',
   alternates: { canonical: '/achievements' },
 }
 
@@ -17,8 +17,8 @@ export default async function AchievementsPage() {
   const res = await listAwards()
   return (
     <>
-      <PageHead title="Achievements" tagline="Hanya prestasi yang sudah diverifikasi.">
-        <p className="lead">Setiap prestasi di halaman ini disertai bukti, seperti sertifikat atau pengumuman resmi penyelenggara.</p>
+      <PageHead title="Achievements" tagline="Verified achievements only.">
+        <p className="lead">Every achievement on this page comes with evidence, such as a certificate or an official announcement from the organiser.</p>
       </PageHead>
       <section className="wrap" style={{ paddingBottom: 'var(--section)' }}>
         {res.state === 'unconfigured' ? (
@@ -26,7 +26,7 @@ export default async function AchievementsPage() {
         ) : res.state === 'error' ? (
           <ErrorNotice />
         ) : res.data.length === 0 ? (
-          <PendingContent>Prestasi kompetisi akan tampil di sini setelah diverifikasi dan dilengkapi bukti oleh pemilik.</PendingContent>
+          <PendingContent>Competition achievements will appear here once the owner has verified them and supplied evidence.</PendingContent>
         ) : (
           <ol className="award-list" style={{ maxWidth: '60ch' }}>
             {res.data.map((a) => {
@@ -43,7 +43,7 @@ export default async function AchievementsPage() {
                   {evidence ? (
                     <p style={{ marginTop: 8 }}>
                       <a className="text-link" href={evidence} target="_blank" rel="noopener noreferrer">
-                        Lihat bukti
+                        View evidence
                       </a>
                     </p>
                   ) : null}

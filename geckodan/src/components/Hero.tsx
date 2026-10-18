@@ -20,8 +20,8 @@ export function Hero({ settings }: { settings: SiteSettings }) {
   const [line1, line2] = splitHeadline(hero.headline)
   const isConcept = !uploaded || hero.image_is_concept
   const alt = uploaded
-    ? hero.image_alt || 'Leopard gecko di antara dedaunan tropis'
-    : 'Ilustrasi konsep: leopard gecko oranye di atas batu berlumut di hutan tropis'
+    ? hero.image_alt || 'Leopard gecko among tropical foliage'
+    : 'Concept illustration: an orange leopard gecko on a mossy rock in a tropical forest'
 
   return (
     <section className="hero" aria-labelledby="hero-title">
@@ -56,12 +56,12 @@ export function Hero({ settings }: { settings: SiteSettings }) {
             <span className="socials__label">Follow our journey</span>
           </div>
           <p className="hero__place">
-            <PinIcon /> Pamulang, Tangerang Selatan
+            <PinIcon /> Pamulang, South Tangerang
           </p>
         </div>
       </div>
       {isConcept ? (
-        <p className="hero__caption">Ilustrasi konsep, bukan foto hewan GeckoDan.</p>
+        <p className="hero__caption">Concept illustration, not a photograph of a GeckoDan animal.</p>
       ) : null}
     </section>
   )

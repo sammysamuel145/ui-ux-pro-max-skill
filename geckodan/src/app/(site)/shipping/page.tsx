@@ -9,7 +9,7 @@ export const revalidate = 60
 
 export const metadata: Metadata = {
   title: 'Shipping',
-  description: 'Informasi pengiriman dan pembelian leopard gecko dari GeckoDan.',
+  description: 'Shipping and purchase information for GeckoDan leopard geckos.',
   alternates: { canonical: '/shipping' },
 }
 
@@ -18,15 +18,15 @@ export default async function ShippingPage() {
   const body = paragraphs(settings.shipping.body)
   return (
     <>
-      <PageHead title="Shipping & Purchase" tagline="Cara membeli dan menerima gecko Anda." />
+      <PageHead title="Shipping & Purchase" tagline="How to buy and receive your gecko." />
       <section className="wrap" style={{ display: 'grid', gap: 48, paddingBottom: 'var(--section)' }}>
         <div className="prose measure">
           {body.length ? (
             body.map((p, i) => <p key={i}>{p}</p>)
           ) : (
             <PendingContent>
-              Kebijakan pengiriman dan pembelian GeckoDan sedang disiapkan. Untuk saat ini, cara pengiriman dan pembayaran dibicarakan langsung
-              lewat WhatsApp.
+              GeckoDan&rsquo;s shipping and purchase policy is being prepared. For now, shipping and payment arrangements are discussed directly
+              on WhatsApp.
             </PendingContent>
           )}
         </div>
@@ -47,11 +47,11 @@ export default async function ShippingPage() {
         <p>
           <a
             className="btn btn-primary"
-            href={whatsappLink(settings.business.whatsapp_number, 'Halo GeckoDan, saya ingin bertanya tentang pengiriman gecko.')}
+            href={whatsappLink(settings.business.whatsapp_number, 'Hello GeckoDan, I would like to ask about shipping a gecko.')}
             target="_blank"
             rel="noopener noreferrer"
           >
-            Tanya pengiriman via WhatsApp
+            Ask about shipping on WhatsApp
           </a>
         </p>
       </section>

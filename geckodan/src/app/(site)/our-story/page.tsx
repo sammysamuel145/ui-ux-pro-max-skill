@@ -8,7 +8,7 @@ export const revalidate = 60
 
 export const metadata: Metadata = {
   title: 'Our Story',
-  description: 'Cerita GeckoDan: sekitar sepuluh tahun di dunia gecko, dari Pamulang, Tangerang Selatan.',
+  description: 'The GeckoDan story: about ten years in the gecko world, from Pamulang, South Tangerang.',
   alternates: { canonical: '/our-story' },
 }
 
@@ -30,8 +30,8 @@ export default async function StoryPage() {
             body.map((p, i) => <p key={i}>{p}</p>)
           ) : (
             <PendingContent>
-              Cerita perjalanan GeckoDan akan ditulis oleh pemilik: bagaimana semuanya dimulai, sekitar sepuluh tahun di dunia gecko, dan
-              apa yang dicari di setiap generasi.
+              The GeckoDan story will be written by the owner: how it all began, about ten years in the gecko world, and
+              what is sought in every generation.
             </PendingContent>
           )}
         </div>

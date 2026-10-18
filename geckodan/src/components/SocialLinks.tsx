@@ -25,7 +25,7 @@ export function SocialIconRow({ socials }: { socials: SocialSettings }) {
             href={socials[p.key]}
             target="_blank"
             rel="noopener noreferrer"
-            aria-label={`GeckoDan di ${p.label} (tab baru)`}
+            aria-label={`GeckoDan on ${p.label} (opens in a new tab)`}
           >
             {p.icon ? <BrandIcon name={p.icon} /> : <span>{p.label}</span>}
           </a>

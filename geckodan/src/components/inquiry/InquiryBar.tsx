@@ -11,15 +11,15 @@ export function InquiryBar() {
     items.map((i) => ({ name: i.name, code: i.code, url: `${origin}/geckos/${i.slug}` })),
   )
   return (
-    <aside className="inquiry-bar on-night" aria-label="Daftar tanya">
+    <aside className="inquiry-bar on-night" aria-label="Inquiry list">
       <p aria-live="polite">
-        <strong>{items.length} gecko</strong> di daftar tanya Anda. Ketersediaan dipastikan oleh GeckoDan lewat WhatsApp.
+        <strong>{items.length} {items.length === 1 ? 'gecko' : 'geckos'}</strong> on your inquiry list. GeckoDan confirms availability on WhatsApp.
       </p>
       <a className="btn btn-primary" href={whatsappLink(whatsappNumber, message)} target="_blank" rel="noopener noreferrer">
-        Tanya via WhatsApp
+        Ask on WhatsApp
       </a>
       <button type="button" className="btn btn-quiet" onClick={clear}>
-        Kosongkan
+        Clear
       </button>
     </aside>
   )

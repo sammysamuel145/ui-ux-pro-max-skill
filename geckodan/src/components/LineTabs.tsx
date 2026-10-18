@@ -68,17 +68,17 @@ export function LineTabs({ lines }: { lines: LineTab[] }) {
             <p>{line.summary}</p>
           ) : (
             <p>
-              <span className="placeholder-tag">Konten menyusul</span>{' '}
-              <span className="soft">Cerita line {line.name} sedang disiapkan oleh GeckoDan.</span>
+              <span className="placeholder-tag">Content coming soon</span>{' '}
+              <span className="soft">The story of the {line.name} line is being prepared by GeckoDan.</span>
             </p>
           )}
         </div>
         <div className="line-panel__actions">
           <Link className="btn btn-dark" href={`/lines/${line.slug}`}>
-            Lihat line {line.name}
+            View the {line.name} line
           </Link>
           <Link className="btn btn-quiet" href={`/geckos?line=${line.slug}`}>
-            Gecko {line.name}
+            {line.name} geckos
           </Link>
         </div>
       </div>

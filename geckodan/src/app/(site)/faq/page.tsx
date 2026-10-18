@@ -10,29 +10,29 @@ export const revalidate = 60
 
 export const metadata: Metadata = {
   title: 'FAQ',
-  description: 'Pertanyaan umum tentang membeli, merawat, dan mengirim leopard gecko dari GeckoDan.',
+  description: 'Common questions about buying, caring for and shipping GeckoDan leopard geckos.',
   alternates: { canonical: '/faq' },
 }
 
 const GROUPS: Array<{ key: Faq['category']; title: string }> = [
-  { key: 'purchase', title: 'Pembelian' },
-  { key: 'shipping', title: 'Pengiriman' },
-  { key: 'care', title: 'Perawatan' },
-  { key: 'general', title: 'Umum' },
+  { key: 'purchase', title: 'Purchase' },
+  { key: 'shipping', title: 'Shipping' },
+  { key: 'care', title: 'Care' },
+  { key: 'general', title: 'General' },
 ]
 
 export default async function FaqPage() {
   const [settings, res] = await Promise.all([getSettings(), listFaqs()])
   return (
     <>
-      <PageHead title="FAQ" tagline="Pertanyaan yang sering diajukan." />
+      <PageHead title="FAQ" tagline="Frequently asked questions." />
       <section className="wrap" style={{ display: 'grid', gap: 56, paddingBottom: 'var(--section)', maxWidth: 900 }}>
         {res.state === 'unconfigured' ? (
           <UnconfiguredNotice />
         ) : res.state === 'error' ? (
           <ErrorNotice />
         ) : res.data.length === 0 ? (
-          <PendingContent>Jawaban pertanyaan umum sedang disiapkan oleh GeckoDan.</PendingContent>
+          <PendingContent>GeckoDan is preparing answers to common questions.</PendingContent>
         ) : (
           GROUPS.map((group) => {
             const items = res.data.filter((f) => f.category === group.key)
@@ -59,7 +59,7 @@ export default async function FaqPage() {
           })
         )}
         <div>
-          <p>Pertanyaan Anda tidak ada di sini?</p>
+          <p>Can&rsquo;t find your question here?</p>
           <a
             className="btn btn-primary"
             style={{ marginTop: 16 }}
@@ -67,7 +67,7 @@ export default async function FaqPage() {
             target="_blank"
             rel="noopener noreferrer"
           >
-            Tanya via WhatsApp
+            Ask on WhatsApp
           </a>
         </div>
       </section>

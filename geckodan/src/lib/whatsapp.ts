@@ -16,19 +16,19 @@ export function whatsappLink(number: string, message?: string): string {
 }
 
 export function geckoInquiryMessage(gecko: InquiryGecko): string {
-  return `Halo GeckoDan, saya tertarik dengan gecko ${gecko.name} (ID: ${gecko.code}). Apakah masih tersedia? Link: ${gecko.url}`
+  return `Hello GeckoDan, I'm interested in the gecko ${gecko.name} (ID: ${gecko.code}). Is it still available? Link: ${gecko.url}`
 }
 
 export function multiInquiryMessage(geckos: InquiryGecko[]): string {
   if (geckos.length === 1 && geckos[0]) return geckoInquiryMessage(geckos[0])
   const lines = geckos.map((g, i) => `${i + 1}. ${g.name} (ID: ${g.code}) ${g.url}`)
   return [
-    'Halo GeckoDan, saya tertarik dengan gecko berikut:',
+    'Hello GeckoDan, I\'m interested in these geckos:',
     ...lines,
-    'Apakah masih tersedia?',
+    'Are they still available?',
   ].join('\n')
 }
 
 export function generalInquiryMessage(): string {
-  return 'Halo GeckoDan, saya ingin bertanya tentang gecko yang tersedia.'
+  return 'Hello GeckoDan, I would like to ask about your available geckos.'
 }

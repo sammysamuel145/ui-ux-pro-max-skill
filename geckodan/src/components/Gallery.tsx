@@ -17,7 +17,7 @@ export function Gallery({ images, name }: { images: GalleryImage[]; name: string
   }
 
   return (
-    <section aria-roledescription="galeri" aria-label={`Foto ${name}`} onKeyDown={onKey}>
+    <section aria-roledescription="gallery" aria-label={`Photos of ${name}`} onKeyDown={onKey}>
       <div className="gallery__main">
         <Image
           key={current.src}
@@ -30,12 +30,12 @@ export function Gallery({ images, name }: { images: GalleryImage[]; name: string
         />
         {count > 1 ? (
           <div className="gallery__nav">
-            <button type="button" onClick={() => go(index - 1)} aria-label="Foto sebelumnya">
+            <button type="button" onClick={() => go(index - 1)} aria-label="Previous photo">
               <svg width="18" height="12" viewBox="0 0 18 12" aria-hidden="true">
                 <path d="M18 6H2M7 1L2 6l5 5" fill="none" stroke="currentColor" strokeWidth="1.6" />
               </svg>
             </button>
-            <button type="button" onClick={() => go(index + 1)} aria-label="Foto berikutnya">
+            <button type="button" onClick={() => go(index + 1)} aria-label="Next photo">
               <svg width="18" height="12" viewBox="0 0 18 12" aria-hidden="true">
                 <path d="M0 6h16M11 1l5 5-5 5" fill="none" stroke="currentColor" strokeWidth="1.6" />
               </svg>
@@ -46,7 +46,7 @@ export function Gallery({ images, name }: { images: GalleryImage[]; name: string
       {count > 1 ? (
         <>
           <p className="sr-only" aria-live="polite">
-            Foto {index + 1} dari {count}
+            Photo {index + 1} of {count}
           </p>
           <div className="gallery__thumbs">
             {images.map((img, i) => (
@@ -54,7 +54,7 @@ export function Gallery({ images, name }: { images: GalleryImage[]; name: string
                 key={img.src}
                 type="button"
                 aria-current={i === index}
-                aria-label={`Lihat foto ${i + 1} dari ${count}`}
+                aria-label={`View photo ${i + 1} of ${count}`}
                 onClick={() => setIndex(i)}
               >
                 <Image src={img.src} alt="" width={84} height={84} />

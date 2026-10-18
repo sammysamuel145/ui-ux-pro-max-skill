@@ -53,7 +53,6 @@ describe('settings schemas', () => {
     const r = businessSchema.parse({
       brand: 'GeckoDan',
       location: 'Pamulang',
-      whatsapp_display: '0851 7441 3278',
       whatsapp_number: '0851-7441-3278',
       maps_url: '',
       google_reviews_url: '',

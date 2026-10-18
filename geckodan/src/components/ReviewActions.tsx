@@ -13,17 +13,17 @@ export function ReviewActions({ business }: { business: BusinessSettings }) {
     <div className="inline-actions">
       {read ? (
         <a className="btn btn-dark" href={read} target="_blank" rel="noopener noreferrer">
-          <BrandIcon name="maps" /> Baca ulasan Google
+          <BrandIcon name="maps" /> Read Google reviews
         </a>
       ) : (
         <p>
-          <span className="placeholder-tag">Menunggu tautan</span>{' '}
-          <span className="soft">Tautan ulasan Google GeckoDan belum diatur.</span>
+          <span className="placeholder-tag">Link pending</span>{' '}
+          <span className="soft">The GeckoDan Google reviews link has not been set yet.</span>
         </p>
       )}
       {write ? (
         <a className="btn btn-quiet" href={write} target="_blank" rel="noopener noreferrer">
-          Tulis ulasan di Google
+          Write a review on Google
         </a>
       ) : null}
     </div>

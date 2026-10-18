@@ -23,11 +23,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const line = res.state === 'ok' ? res.data : null
   const name = line?.name ?? slug.toUpperCase()
   return {
-    title: line?.seo_title || `Line ${name}`,
+    title: line?.seo_title || `${name} line`,
     description:
       line?.seo_description ||
       excerpt(line?.description, 155) ||
-      `${name}, salah satu signature line leopard gecko GeckoDan di Pamulang, Tangerang Selatan.`,
+      `${name}, one of the signature leopard gecko lines of GeckoDan in Pamulang, South Tangerang.`,
     alternates: { canonical: `/lines/${slug}` },
   }
 }
@@ -61,23 +61,23 @@ export default async function LinePage({ params }: Props) {
 
   return (
     <>
-      <PageHead title={line.name} tagline={line.tagline ?? 'Signature line GeckoDan'} />
+      <PageHead title={line.name} tagline={line.tagline ?? 'A GeckoDan signature line'} />
       <section className="wrap" style={{ display: 'grid', gap: 48, paddingBottom: 'var(--section)' }}>
         {cover ? (
           <div style={{ position: 'relative', aspectRatio: '16 / 9', background: 'var(--paper-3)' }}>
-            <Image src={cover} alt={line.cover_photo_alt || `Line ${line.name}`} fill sizes="100vw" style={{ objectFit: 'cover' }} />
+            <Image src={cover} alt={line.cover_photo_alt || `${line.name} line`} fill sizes="100vw" style={{ objectFit: 'cover' }} />
           </div>
         ) : null}
         <div className="prose measure">
           {body.length ? (
             body.map((p, i) => <p key={i}>{p}</p>)
           ) : (
-            <PendingContent>Cerita dan karakter line {line.name} sedang ditulis oleh GeckoDan.</PendingContent>
+            <PendingContent>The story and character of the {line.name} line are being written by GeckoDan.</PendingContent>
           )}
         </div>
         <div>
           <h2 className="headline" style={{ textTransform: 'uppercase' }}>
-            Gecko {line.name}
+            {line.name} geckos
           </h2>
           <div style={{ marginTop: 32 }}>
             {geckos.length ? (
@@ -87,7 +87,7 @@ export default async function LinePage({ params }: Props) {
                 ))}
               </div>
             ) : (
-              <PendingContent>Belum ada gecko line {line.name} yang dipublikasikan.</PendingContent>
+              <PendingContent>No {line.name} geckos have been published yet.</PendingContent>
             )}
           </div>
         </div>

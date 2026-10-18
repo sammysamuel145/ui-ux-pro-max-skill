@@ -1,6 +1,6 @@
 # GeckoDan website
 
-Website for GeckoDan, a leopard gecko breeder in Pamulang, Tangerang Selatan.
+Website for GeckoDan, a leopard gecko breeder in Pamulang, South Tangerang.
 Public catalog, collection, signature lines, story, achievements, reviews, FAQ,
 shipping and contact pages, with every purchase inquiry sent to WhatsApp, and
 an owner-only admin dashboard.

@@ -13,10 +13,10 @@ export function Coupon({ whatsappNumber }: { whatsappNumber: string }) {
   const [message, setMessage] = useState('')
 
   const compose = () => {
-    const lines = ['Halo GeckoDan,']
-    if (name.trim()) lines.push(`Nama saya ${name.trim()}.`)
-    if (interest.trim()) lines.push(`Saya tertarik dengan: ${interest.trim()}.`)
-    lines.push(message.trim() || 'Saya ingin bertanya tentang gecko yang tersedia.')
+    const lines = ['Hello GeckoDan,']
+    if (name.trim()) lines.push(`My name is ${name.trim()}.`)
+    if (interest.trim()) lines.push(`I am interested in: ${interest.trim()}.`)
+    lines.push(message.trim() || 'I would like to ask about the available geckos.')
     return lines.join('\n')
   }
 
@@ -28,31 +28,31 @@ export function Coupon({ whatsappNumber }: { whatsappNumber: string }) {
   return (
     <div className="coupon">
       <div className="coupon__left">
-        <h2>Tanya langsung ke breeder</h2>
-        <p>Isi singkat, lalu WhatsApp terbuka dengan pesan Anda. Tidak ada data yang kami simpan dari formulir ini.</p>
+        <h2>Ask the breeder directly</h2>
+        <p>Fill in a few details and WhatsApp opens with your message. We store nothing from this form.</p>
       </div>
       <form className="coupon__form" onSubmit={onSubmit} action={whatsappLink(whatsappNumber)} method="get" target="_blank">
         <label className="sr-only" htmlFor="coupon-name">
-          Nama
+          Name
         </label>
-        <input id="coupon-name" name="name" autoComplete="name" placeholder="Nama Anda" value={name} onChange={(e) => setName(e.target.value)} maxLength={80} />
+        <input id="coupon-name" name="name" autoComplete="name" placeholder="Your name" value={name} onChange={(e) => setName(e.target.value)} maxLength={80} />
         <label className="sr-only" htmlFor="coupon-interest">
-          Gecko yang diminati
+          Gecko you are interested in
         </label>
         <input
           id="coupon-interest"
           name="interest"
-          placeholder="Gecko atau line yang diminati (opsional)"
+          placeholder="Gecko or line you are interested in (optional)"
           value={interest}
           onChange={(e) => setInterest(e.target.value)}
           maxLength={120}
         />
         <label className="sr-only" htmlFor="coupon-message">
-          Pesan
+          Message
         </label>
-        <textarea id="coupon-message" name="text" placeholder="Pertanyaan Anda" value={message} onChange={(e) => setMessage(e.target.value)} maxLength={800} />
+        <textarea id="coupon-message" name="text" placeholder="Your question" value={message} onChange={(e) => setMessage(e.target.value)} maxLength={800} />
         <button type="submit" className="btn">
-          Kirim via WhatsApp
+          Send via WhatsApp
         </button>
       </form>
     </div>

@@ -9,7 +9,7 @@ import { generalInquiryMessage, whatsappLink } from '@/lib/whatsapp'
 
 export const metadata: Metadata = {
   title: 'Geckos',
-  description: 'Katalog leopard gecko GeckoDan yang tersedia. Cari berdasarkan nama atau ID, saring per line dan status, lalu tanyakan lewat WhatsApp.',
+  description: 'The GeckoDan leopard gecko catalogue. Search by name or ID, filter by line and status, then inquire on WhatsApp.',
   alternates: { canonical: '/geckos' },
 }
 
@@ -24,18 +24,18 @@ export default async function GeckosPage({ searchParams }: Props) {
   return (
     <>
       <PageHead title="Our Geckos" tagline="A Legacy in Every Line.">
-        <p className="lead">Gecko yang tersedia untuk dibeli. Harga tidak ditampilkan: tanyakan langsung lewat WhatsApp.</p>
+        <p className="lead">Geckos available for purchase. Prices are not shown: ask directly on WhatsApp.</p>
       </PageHead>
-      <section className="wrap" style={{ paddingBottom: 'var(--section)' }} aria-label="Katalog">
+      <section className="wrap" style={{ paddingBottom: 'var(--section)' }} aria-label="Catalogue">
         <form className="filters" method="get" action="/geckos" role="search">
           <div className="field field-search">
-            <label htmlFor="q">Cari nama, ID, atau morph</label>
-            <input id="q" name="q" type="search" defaultValue={filters.q} maxLength={60} placeholder="Contoh: GD-0007" />
+            <label htmlFor="q">Search name, ID or morph</label>
+            <input id="q" name="q" type="search" defaultValue={filters.q} maxLength={60} placeholder="e.g. GD-0007" />
           </div>
           <div className="field">
             <label htmlFor="line">Line</label>
             <select id="line" name="line" defaultValue={filters.line}>
-              <option value="">Semua line</option>
+              <option value="">All lines</option>
               {lineOptions.map((l) => (
                 <option key={l.slug} value={l.slug}>
                   {l.name}
@@ -46,33 +46,33 @@ export default async function GeckosPage({ searchParams }: Props) {
           <div className="field">
             <label htmlFor="status">Status</label>
             <select id="status" name="status" defaultValue={filters.status}>
-              <option value="open">Available dan reserved</option>
+              <option value="open">Available and reserved</option>
               <option value="available">Available</option>
               <option value="reserved">Reserved</option>
               <option value="sold">Sold</option>
-              <option value="all">Semua status</option>
+              <option value="all">All statuses</option>
             </select>
           </div>
           <div className="field">
-            <label htmlFor="sex">Jenis kelamin</label>
+            <label htmlFor="sex">Sex</label>
             <select id="sex" name="sex" defaultValue={filters.sex}>
-              <option value="">Semua</option>
-              <option value="male">Jantan</option>
-              <option value="female">Betina</option>
-              <option value="unknown">Belum diketahui</option>
+              <option value="">All</option>
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+              <option value="unknown">Unknown</option>
             </select>
           </div>
           <div className="field">
-            <label htmlFor="sort">Urutkan</label>
+            <label htmlFor="sort">Sort by</label>
             <select id="sort" name="sort" defaultValue={filters.sort}>
-              <option value="newest">Terbaru</option>
-              <option value="name">Nama A-Z</option>
+              <option value="newest">Newest</option>
+              <option value="name">Name A-Z</option>
               <option value="code">ID</option>
             </select>
           </div>
           <div className="filters__actions">
             <button type="submit" className="btn btn-dark">
-              Terapkan
+              Apply
             </button>
             {active ? (
               <Link className="btn btn-quiet" href="/geckos">
@@ -88,7 +88,7 @@ export default async function GeckosPage({ searchParams }: Props) {
           <ErrorNotice />
         ) : result.data.length === 0 ? (
           <EmptyNotice
-            title={active ? 'Tidak ada gecko yang cocok' : 'Katalog sedang disiapkan'}
+            title={active ? 'No matching geckos' : 'Catalogue in preparation'}
             action={
               <a
                 className="btn btn-primary"
@@ -96,23 +96,23 @@ export default async function GeckosPage({ searchParams }: Props) {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                Tanya stok via WhatsApp
+                Ask about stock on WhatsApp
               </a>
             }
           >
             <p>
               {active
-                ? 'Coba ubah pencarian atau saringan. Stok terbaru juga bisa ditanyakan langsung ke GeckoDan.'
-                : 'Belum ada gecko yang dipublikasikan. Stok terbaru bisa ditanyakan langsung ke GeckoDan.'}
+                ? 'Try changing your search or filters. You can also ask GeckoDan directly about current stock.'
+                : 'No geckos have been published yet. You can ask GeckoDan directly about current stock.'}
             </p>
           </EmptyNotice>
         ) : (
           <>
             <p className="results-line" role="status">
               <span>
-                {result.data.length} gecko {active ? 'cocok dengan saringan' : 'di katalog'}
+                {result.data.length} {result.data.length === 1 ? 'gecko' : 'geckos'} {active ? 'match your filters' : 'in the catalogue'}
               </span>
-              <span>Status selalu dikonfirmasi ulang lewat WhatsApp.</span>
+              <span>Status is always reconfirmed on WhatsApp.</span>
             </p>
             <div className="gecko-grid">
               {result.data.map((g) => (

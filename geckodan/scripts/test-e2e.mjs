@@ -152,7 +152,7 @@ try {
   check('the published gecko page loads', (await visitor.getByRole('heading', { level: 1 }).textContent())?.includes(name))
   const photo = visitor.locator('main img[src*="storage"], main img[src*="_next/image"]').first()
   check('the gecko photo is shown', (await photo.count()) === 1)
-  const wa = await visitor.getByRole('main').getByRole('link', { name: 'Tanya via WhatsApp' }).getAttribute('href')
+  const wa = await visitor.getByRole('main').getByRole('link', { name: 'Ask on WhatsApp' }).getAttribute('href')
   const message = decodeURIComponent(new URL(wa).searchParams.get('text') ?? '')
   check('the WhatsApp link goes to the GeckoDan number', wa.startsWith('https://wa.me/6285174413278'))
   check(

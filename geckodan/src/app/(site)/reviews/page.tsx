@@ -9,7 +9,7 @@ export const revalidate = 60
 
 export const metadata: Metadata = {
   title: 'Reviews',
-  description: 'Ulasan Google dan testimoni pelanggan GeckoDan.',
+  description: 'Google reviews and customer testimonials for GeckoDan.',
   alternates: { canonical: '/reviews' },
 }
 
@@ -17,30 +17,30 @@ export default async function ReviewsPage() {
   const [settings, res] = await Promise.all([getSettings(), listTestimonials()])
   return (
     <>
-      <PageHead title="Reviews" tagline="Dari para pemilik gecko GeckoDan." />
+      <PageHead title="Reviews" tagline="From the people who keep our geckos." />
       <section className="wrap" style={{ display: 'grid', gap: 64, paddingBottom: 'var(--section)' }}>
         <div>
           <h2 className="headline" style={{ fontSize: 'clamp(1.75rem, 1.2rem + 2vw, 2.75rem)' }}>
             Google Reviews
           </h2>
           <p className="soft measure" style={{ margin: '12px 0 24px' }}>
-            Ulasan Google ditulis langsung oleh pelanggan di profil bisnis GeckoDan. Kami tidak menyalin atau meringkasnya di sini.
+            Google reviews are written by customers directly on the GeckoDan business profile. We do not copy or summarise them here.
           </p>
           <ReviewActions business={settings.business} />
         </div>
         <div>
           <h2 className="headline" style={{ fontSize: 'clamp(1.75rem, 1.2rem + 2vw, 2.75rem)' }}>
-            Testimoni pelanggan
+            Customer testimonials
           </h2>
           <p className="soft measure" style={{ margin: '12px 0 32px' }}>
-            Testimoni ini dikirim langsung ke GeckoDan dan dipublikasikan dengan izin pengirimnya. Testimoni ini terpisah dari ulasan Google.
+            These testimonials were sent directly to GeckoDan and are published with the sender&rsquo;s permission. They are separate from Google reviews.
           </p>
           {res.state === 'unconfigured' ? (
             <UnconfiguredNotice />
           ) : res.state === 'error' ? (
             <ErrorNotice />
           ) : res.data.length === 0 ? (
-            <PendingContent>Testimoni akan tampil setelah pelanggan memberi izin publikasi.</PendingContent>
+            <PendingContent>Testimonials will appear once customers have given permission to publish.</PendingContent>
           ) : (
             <div style={{ display: 'grid', gap: 56 }}>
               {res.data.map((t) => (

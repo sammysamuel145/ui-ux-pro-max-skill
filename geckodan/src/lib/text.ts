@@ -25,7 +25,7 @@ export function slugify(input: string): string {
     .slice(0, 80)
 }
 
-const dateFmt = new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' })
+const dateFmt = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' })
 
 export function formatDate(iso: string | null | undefined): string | null {
   if (!iso) return null

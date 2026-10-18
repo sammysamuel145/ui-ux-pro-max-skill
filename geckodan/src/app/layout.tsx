@@ -17,9 +17,9 @@ export const metadata: Metadata = {
   metadataBase: new URL(siteUrl()),
   title: { default: 'GeckoDan · Premium Leopard Gecko Breeder', template: '%s · GeckoDan' },
   description:
-    'GeckoDan, breeder leopard gecko premium di Pamulang, Tangerang Selatan. Lihat gecko yang tersedia dan tanyakan langsung lewat WhatsApp.',
+    'GeckoDan, a premium leopard gecko breeder in Pamulang, South Tangerang. Browse available geckos and inquire directly on WhatsApp.',
   applicationName: 'GeckoDan',
-  openGraph: { type: 'website', siteName: 'GeckoDan', locale: 'id_ID' },
+  openGraph: { type: 'website', siteName: 'GeckoDan', locale: 'en_US' },
   twitter: { card: 'summary_large_image' },
 }
 
@@ -31,7 +31,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="id" className={`${marcellus.variable} ${cormorant.variable} ${montserrat.variable}`}>
+    <html lang="en" className={`${marcellus.variable} ${cormorant.variable} ${montserrat.variable}`}>
       <body>{children}</body>
     </html>
   )

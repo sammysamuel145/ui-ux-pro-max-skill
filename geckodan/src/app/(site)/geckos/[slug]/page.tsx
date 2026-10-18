@@ -20,13 +20,13 @@ type Props = { params: Promise<{ slug: string }> }
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
   const res = await getGeckoBySlug(slug)
-  if (res.state !== 'ok' || !res.data) return { title: 'Gecko tidak ditemukan', robots: { index: false } }
+  if (res.state !== 'ok' || !res.data) return { title: 'Gecko not found', robots: { index: false } }
   const g = res.data
   const cover = mediaUrl(g.photos[0]?.storage_path)
   const description =
     g.seo_description ||
     excerpt(g.description, 155) ||
-    `${g.name} (ID ${g.code})${g.morph ? `, ${g.morph}` : ''}. Leopard gecko dari GeckoDan, Pamulang.`
+    `${g.name} (ID ${g.code})${g.morph ? `, ${g.morph}` : ''}. Leopard gecko from GeckoDan, Pamulang.`
   return {
     title: g.seo_title || `${g.name} (${g.code})`,
     description,
@@ -62,7 +62,7 @@ export default async function GeckoPage({ params }: Props) {
   const forSale = g.visibility !== 'showcase'
   const message = geckoInquiryMessage({ name: g.name, code: g.code, url: detailUrl })
   const images = g.photos
-    .map((p) => ({ src: mediaUrl(p.storage_path), alt: p.alt || `Foto ${g.name}` }))
+    .map((p) => ({ src: mediaUrl(p.storage_path), alt: p.alt || `Photo of ${g.name}` }))
     .filter((i): i is { src: string; alt: string } => Boolean(i.src))
   const hatch = formatDate(g.hatch_date)
   const description = paragraphs(g.description)
@@ -71,7 +71,7 @@ export default async function GeckoPage({ params }: Props) {
     <article className="wrap section" style={{ paddingTop: 'clamp(32px, 5vw, 72px)' }}>
       <p className="small" style={{ marginBottom: 24 }}>
         <Link href={forSale ? '/geckos' : '/showcase'} className="text-link">
-          {forSale ? 'Kembali ke katalog' : 'Kembali ke koleksi'}
+          {forSale ? 'Back to the catalogue' : 'Back to the showcase'}
         </Link>
       </p>
       <div className="detail">
@@ -92,7 +92,7 @@ export default async function GeckoPage({ params }: Props) {
           ) : null}
         </div>
 
-        <aside className="record" aria-label="Catatan breeder">
+        <aside className="record" aria-label="Breeder record">
           <h1>{g.name}</h1>
           <p className="record__code">ID {g.code}</p>
           <div style={{ marginTop: 20 }}>
@@ -104,7 +104,7 @@ export default async function GeckoPage({ params }: Props) {
                 </p>
               </>
             ) : (
-              <p className="small soft">Gecko koleksi GeckoDan, tidak dijual.</p>
+              <p className="small soft">A GeckoDan showcase gecko, not for sale.</p>
             )}
           </div>
           <dl>
@@ -124,23 +124,23 @@ export default async function GeckoPage({ params }: Props) {
                 </dd>
               </>
             ) : null}
-            <dt>Jenis kelamin</dt>
+            <dt>Sex</dt>
             <dd>{SEX_LABEL[g.sex]}</dd>
             {hatch ? (
               <>
-                <dt>Tanggal menetas</dt>
+                <dt>Hatch date</dt>
                 <dd>{hatch}</dd>
               </>
             ) : null}
             {g.weight_grams ? (
               <>
-                <dt>Berat</dt>
+                <dt>Weight</dt>
                 <dd>{g.weight_grams} g</dd>
               </>
             ) : null}
             {g.sire ? (
               <>
-                <dt>Induk jantan</dt>
+                <dt>Sire</dt>
                 <dd>
                   <Link className="text-link" href={`/geckos/${g.sire.slug}`}>
                     {g.sire.name} ({g.sire.code})
@@ -150,7 +150,7 @@ export default async function GeckoPage({ params }: Props) {
             ) : null}
             {g.dam ? (
               <>
-                <dt>Induk betina</dt>
+                <dt>Dam</dt>
                 <dd>
                   <Link className="text-link" href={`/geckos/${g.dam.slug}`}>
                     {g.dam.name} ({g.dam.code})
@@ -160,18 +160,18 @@ export default async function GeckoPage({ params }: Props) {
             ) : null}
             {g.lineage ? (
               <>
-                <dt>Silsilah</dt>
+                <dt>Lineage</dt>
                 <dd style={{ whiteSpace: 'pre-line' }}>{g.lineage}</dd>
               </>
             ) : null}
-            <dt>Status listing</dt>
+            <dt>Listing</dt>
             <dd>{VISIBILITY_LABEL[g.visibility]}</dd>
           </dl>
           <div className="record__actions">
             {forSale && g.status !== 'sold' ? (
               <>
                 <a className="btn btn-primary" href={whatsappLink(settings.business.whatsapp_number, message)} target="_blank" rel="noopener noreferrer">
-                  Tanya via WhatsApp
+                  Ask on WhatsApp
                 </a>
                 <InquiryToggle gecko={{ id: g.id, name: g.name, code: g.code, slug: g.slug }} />
               </>
@@ -180,15 +180,15 @@ export default async function GeckoPage({ params }: Props) {
                 className="btn btn-dark"
                 href={whatsappLink(
                   settings.business.whatsapp_number,
-                  `Halo GeckoDan, saya melihat ${g.name} (ID: ${g.code}). Apakah ada gecko serupa yang tersedia? Link: ${detailUrl}`,
+                  `Hello GeckoDan, I saw ${g.name} (ID: ${g.code}). Do you have a similar gecko available? Link: ${detailUrl}`,
                 )}
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                Tanya gecko serupa
+                Ask about similar geckos
               </a>
             )}
-            <p className="small soft">Harga tidak ditampilkan di situs. Pesan WhatsApp bukan pembelian: GeckoDan akan mengonfirmasi ketersediaan.</p>
+            <p className="small soft">Prices are not shown on this site. A WhatsApp message is not a purchase: GeckoDan will confirm availability.</p>
           </div>
         </aside>
       </div>

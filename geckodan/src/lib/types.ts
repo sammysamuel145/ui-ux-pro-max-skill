@@ -99,7 +99,6 @@ export type Faq = {
 export type BusinessSettings = {
   brand: string
   location: string
-  whatsapp_display: string
   whatsapp_number: string
   maps_url: string
   google_reviews_url: string

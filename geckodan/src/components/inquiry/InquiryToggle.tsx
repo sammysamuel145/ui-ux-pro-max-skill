@@ -7,8 +7,8 @@ export function InquiryToggle({ gecko }: { gecko: InquiryItem }) {
   const selected = has(gecko.id)
   return (
     <button type="button" className="inquiry-toggle" aria-pressed={selected} onClick={() => toggle(gecko)}>
-      {selected ? 'Ada di daftar tanya' : 'Tambah ke daftar tanya'}
-      <span className="sr-only"> untuk {gecko.name}</span>
+      {selected ? 'On your inquiry list' : 'Add to inquiry list'}
+      <span className="sr-only"> for {gecko.name}</span>
     </button>
   )
 }

@@ -124,7 +124,6 @@ export const faqSchema = z.object({
 export const businessSchema = z.object({
   brand: requiredText(80, 'Nama brand'),
   location: requiredText(200, 'Lokasi'),
-  whatsapp_display: requiredText(40, 'Nomor WhatsApp'),
   whatsapp_number: z
     .string()
     .trim()

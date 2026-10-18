@@ -55,11 +55,11 @@ export function SiteHeader({ whatsappNumber }: { whatsappNumber: string }) {
   return (
     <header className={`site-header${overlay ? ' is-overlay on-night' : ''}`}>
       <div className="wrap site-header__bar">
-        <Link href="/" className="brand-link" aria-label="GeckoDan, beranda">
+        <Link href="/" className="brand-link" aria-label="GeckoDan, home">
           <Image src="/brand/geckodan-logo-256.png" alt="" width={256} height={242} preload />
           <span>GeckoDan</span>
         </Link>
-        <nav className="nav-primary" aria-label="Utama">
+        <nav className="nav-primary" aria-label="Primary">
           {PRIMARY.map((item) => (
             <Link key={item.href} href={item.href} aria-current={isCurrent(pathname, item.href) ? 'page' : undefined}>
               {item.label}
@@ -67,7 +67,7 @@ export function SiteHeader({ whatsappNumber }: { whatsappNumber: string }) {
           ))}
         </nav>
         <details className="menu" ref={menuRef}>
-          <summary aria-label="Menu lengkap">
+          <summary aria-label="Full menu">
             <span className="menu__label">Menu</span>
             <span className="menu__icon" aria-hidden="true">
               <span />
@@ -76,7 +76,7 @@ export function SiteHeader({ whatsappNumber }: { whatsappNumber: string }) {
             </span>
           </summary>
           <div className="menu__panel on-night">
-            <nav aria-label="Semua halaman">
+            <nav aria-label="All pages">
               <ul>
                 {ALL.map((item) => (
                   <li key={item.href}>
@@ -93,7 +93,7 @@ export function SiteHeader({ whatsappNumber }: { whatsappNumber: string }) {
               target="_blank"
               rel="noopener noreferrer"
             >
-              Tanya via WhatsApp
+              Ask on WhatsApp
             </a>
           </div>
         </details>

@@ -17,8 +17,8 @@ describe('normalizeWhatsappNumber', () => {
 
 describe('whatsappLink', () => {
   it('builds a wa.me link with an encoded message', () => {
-    const link = whatsappLink('085174413278', 'Halo & tanya: 100%?')
-    expect(link).toBe('https://wa.me/6285174413278?text=Halo%20%26%20tanya%3A%20100%25%3F')
+    const link = whatsappLink('085174413278', 'Hello & ask: 100%?')
+    expect(link).toBe('https://wa.me/6285174413278?text=Hello%20%26%20ask%3A%20100%25%3F')
   })
   it('omits the text parameter without a message', () => {
     expect(whatsappLink('6285174413278')).toBe('https://wa.me/6285174413278')
@@ -30,7 +30,7 @@ describe('inquiry messages', () => {
 
   it('includes the name, ID and detail URL of one gecko', () => {
     expect(geckoInquiryMessage(gecko)).toBe(
-      'Halo GeckoDan, saya tertarik dengan gecko Ember (ID: GD-0007). Apakah masih tersedia? Link: https://geckodan.example/geckos/ember',
+      "Hello GeckoDan, I'm interested in the gecko Ember (ID: GD-0007). Is it still available? Link: https://geckodan.example/geckos/ember",
     )
   })
 

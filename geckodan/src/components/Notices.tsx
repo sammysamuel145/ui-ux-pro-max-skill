@@ -3,10 +3,10 @@ import type { ReactNode } from 'react'
 export function UnconfiguredNotice() {
   return (
     <div className="notice" role="status">
-      <h2>Database belum terhubung</h2>
+      <h2>Database not connected</h2>
       <p className="measure">
-        Konten halaman ini dimuat dari database GeckoDan. Isi NEXT_PUBLIC_SUPABASE_URL dan
-        NEXT_PUBLIC_SUPABASE_ANON_KEY di pengaturan server agar data tampil.
+        This page loads its content from the GeckoDan database. Set NEXT_PUBLIC_SUPABASE_URL and
+        NEXT_PUBLIC_SUPABASE_ANON_KEY in the server settings to show the data.
       </p>
     </div>
   )
@@ -15,8 +15,8 @@ export function UnconfiguredNotice() {
 export function ErrorNotice() {
   return (
     <div className="notice" role="alert">
-      <h2>Data belum bisa dimuat</h2>
-      <p className="measure">Terjadi gangguan saat mengambil data. Muat ulang halaman ini, atau hubungi kami lewat WhatsApp.</p>
+      <h2>Data could not be loaded</h2>
+      <p className="measure">Something went wrong while fetching the data. Reload this page, or contact us on WhatsApp.</p>
     </div>
   )
 }
@@ -35,7 +35,7 @@ export function EmptyNotice({ title, children, action }: { title: string; childr
 export function PendingContent({ children }: { children: ReactNode }) {
   return (
     <p>
-      <span className="placeholder-tag">Konten menyusul</span> <span className="soft">{children}</span>
+      <span className="placeholder-tag">Content coming soon</span> <span className="soft">{children}</span>
     </p>
   )
 }

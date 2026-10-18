@@ -1,9 +1,11 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { BusinessJsonLd } from '@/components/BusinessJsonLd'
+import { Carousel } from '@/components/Carousel'
 import { GeckoImage } from '@/components/GeckoImage'
 import { Hero } from '@/components/Hero'
 import { ArrowIcon, BrandIcon, LineIcon, PinIcon } from '@/components/Icons'
+import { Leaves } from '@/components/Leaves'
 import { ErrorNotice, UnconfiguredNotice } from '@/components/Notices'
 import { activePlatforms } from '@/components/SocialLinks'
 import { Status } from '@/components/Status'
@@ -18,6 +20,7 @@ import {
 } from '@/lib/data/public'
 import { siteUrl } from '@/lib/env'
 import { mediaUrl } from '@/lib/media'
+import { formatWhatsappDisplay } from '@/lib/phone'
 import { excerpt, paragraphs } from '@/lib/text'
 import { generalInquiryMessage, geckoInquiryMessage, whatsappLink } from '@/lib/whatsapp'
 import './home.css'
@@ -27,10 +30,10 @@ export const revalidate = 60
 /** A labelled stand-in for a picture the owner has not uploaded yet. Never a stock or generated animal. */
 function PhotoSlot({ label }: { label: string }) {
   return (
-    <div className="slot" role="img" aria-label={`${label}: foto menyusul`}>
+    <div className="slot" role="img" aria-label={`${label}: photo coming soon`}>
       <Image src="/brand/geckodan-logo-256.png" alt="" width={96} height={91} />
       <span>{label}</span>
-      <small>Foto menyusul</small>
+      <small>Photo coming soon</small>
     </div>
   )
 }
@@ -38,7 +41,7 @@ function PhotoSlot({ label }: { label: string }) {
 export default async function HomePage() {
   const [settings, featured, lines, showcase, awards, testimonials, faqs] = await Promise.all([
     getSettings(),
-    featuredGeckos(3),
+    featuredGeckos(9),
     listLines(),
     showcaseGeckos(4),
     listAwards(),
@@ -47,6 +50,7 @@ export default async function HomePage() {
   ])
   const { business, socials, story } = settings
   const wa = business.whatsapp_number
+  const phone = formatWhatsappDisplay(wa)
   const base = siteUrl()
   const storyParas = paragraphs(story.body)
   const firstTestimonial = testimonials.state === 'ok' ? testimonials.data[0] : undefined
@@ -60,81 +64,19 @@ export default async function HomePage() {
       <BusinessJsonLd settings={settings} />
       <Hero settings={settings} />
 
-      {/* Featured geckos */}
-      <section className="band band--cream" aria-labelledby="featured-title">
-        <div className="band__inner">
-          <div className="band__head">
-            <div>
-              <p className="band__kicker">Our selected</p>
-              <h2 id="featured-title" className="band__title">
-                Featured Geckos
-              </h2>
-            </div>
-            <p className="band__lead">Pilihan gecko yang sedang tersedia. Harga dan ketersediaan dikonfirmasi langsung lewat WhatsApp.</p>
-            <Link className="band__more" href="/geckos">
-              Lihat semua geckos <ArrowIcon />
-            </Link>
-          </div>
-          {featured.state === 'unconfigured' ? (
-            <UnconfiguredNotice />
-          ) : featured.state === 'error' ? (
-            <ErrorNotice />
-          ) : featured.data.length === 0 ? (
-            <div className="featured-empty">
-              <PhotoSlot label="Gecko tersedia" />
-              <p>
-                Belum ada gecko yang dipublikasikan di katalog. Tanyakan stok terbaru langsung lewat WhatsApp.
-                <a className="btn btn-primary btn-sm" href={whatsappLink(wa, generalInquiryMessage())} target="_blank" rel="noopener noreferrer">
-                  Tanya stok <BrandIcon name="whatsapp" />
-                </a>
-              </p>
-            </div>
-          ) : (
-            <ul className="featured-grid">
-              {featured.data.map((g) => {
-                const href = `/geckos/${g.slug}`
-                const message = geckoInquiryMessage({ name: g.name, code: g.code, url: `${base}${href}` })
-                return (
-                  <li key={g.id} className="featured-card">
-                    <Link href={href} className="featured-card__media" aria-label={`Lihat ${g.name}`}>
-                      <GeckoImage photo={g.photos[0]} name={g.name} sizes="(max-width: 760px) 100vw, 30vw" />
-                      <span className="featured-card__badge">
-                        <Status status={g.status} />
-                      </span>
-                    </Link>
-                    <div className="featured-card__row">
-                      <div>
-                        <strong>ID {g.code}</strong>
-                        <span>{[g.name, g.morph].filter(Boolean).join(' · ')}</span>
-                      </div>
-                      <Link href={href} className="featured-card__go" aria-label={`Detail ${g.name}`}>
-                        <ArrowIcon />
-                      </Link>
-                    </div>
-                    {g.status !== 'sold' ? (
-                      <a className="btn btn-primary btn-sm" href={whatsappLink(wa, message)} target="_blank" rel="noopener noreferrer">
-                        Ask via WhatsApp <BrandIcon name="whatsapp" />
-                      </a>
-                    ) : null}
-                  </li>
-                )
-              })}
-            </ul>
-          )}
-        </div>
-      </section>
-
       {/* Signature lines */}
-      <section className="band band--forest" aria-labelledby="lines-title">
+      <section className="band band--a" aria-labelledby="lines-title">
+        <Leaves side="left" />
+        <Leaves side="right" />
         <div className="band__inner lines-band">
           <div className="lines-band__copy">
-            <p className="band__kicker">Signature lines</p>
-            <h2 id="lines-title" className="band__title">
-              Three distinct bloodlines
+            <p className="band__kicker">Signature Lines</p>
+            <h2 id="lines-title" className="band__title band__title--gold">
+              Three Distinct Bloodlines
             </h2>
-            <p>MANTRA, KAFKA, dan VALKRIE adalah tiga signature line GeckoDan.</p>
+            <p>MANTRA, KAFKA and VALKRIE are GeckoDan&rsquo;s three signature lines.</p>
             <Link className="band__more" href="/lines/mantra">
-              Pelajari lebih lanjut <ArrowIcon />
+              Learn more <ArrowIcon />
             </Link>
           </div>
           {lines.state === 'ok' ? (
@@ -145,7 +87,7 @@ export default async function HomePage() {
                   <li key={l.slug}>
                     <Link href={`/lines/${l.slug}`} className="line-card">
                       {cover ? (
-                        <Image src={cover} alt={l.cover_photo_alt || `Line ${l.name}`} fill sizes="(max-width: 760px) 100vw, 20vw" style={{ objectFit: 'cover' }} />
+                        <Image src={cover} alt={l.cover_photo_alt || `${l.name} line`} fill sizes="(max-width: 760px) 100vw, 20vw" style={{ objectFit: 'cover' }} />
                       ) : (
                         <span className="line-card__plate" aria-hidden="true">
                           <Image src="/brand/geckodan-logo-256.png" alt="" width={96} height={91} />
@@ -155,7 +97,7 @@ export default async function HomePage() {
                         <strong>{l.name}</strong>
                         {l.tagline ? <small>{l.tagline}</small> : null}
                         <em>
-                          Lihat line {l.name} <ArrowIcon />
+                          View line {l.name} <ArrowIcon />
                         </em>
                       </span>
                     </Link>
@@ -171,17 +113,85 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* Featured geckos */}
+      <section className="band band--b" aria-labelledby="featured-title">
+        <Leaves side="left" />
+        <Leaves side="right" />
+        <div className="band__inner">
+          <div className="band__head">
+            <div>
+              <p className="band__kicker">Our Selected</p>
+              <h2 id="featured-title" className="band__title">
+                Featured Geckos
+              </h2>
+            </div>
+            <p className="band__lead">Geckos available right now. Price and availability are confirmed directly on WhatsApp.</p>
+            <Link className="band__more" href="/geckos">
+              View all geckos <ArrowIcon />
+            </Link>
+          </div>
+          {featured.state === 'unconfigured' ? (
+            <UnconfiguredNotice />
+          ) : featured.state === 'error' ? (
+            <ErrorNotice />
+          ) : featured.data.length === 0 ? (
+            <div className="featured-empty">
+              <PhotoSlot label="Available gecko" />
+              <p>
+                No geckos are published in the catalog yet. Ask about current stock on WhatsApp.
+                <a className="btn btn-primary btn-sm" href={whatsappLink(wa, generalInquiryMessage())} target="_blank" rel="noopener noreferrer">
+                  Ask about stock <BrandIcon name="whatsapp" />
+                </a>
+              </p>
+            </div>
+          ) : (
+            <Carousel label="Featured geckos">
+              {featured.data.map((g) => {
+                const href = `/geckos/${g.slug}`
+                const message = geckoInquiryMessage({ name: g.name, code: g.code, url: `${base}${href}` })
+                return (
+                  <li key={g.id} className="featured-card">
+                    <Link href={href} className="featured-card__media" aria-label={`View ${g.name}`}>
+                      <GeckoImage photo={g.photos[0]} name={g.name} sizes="(max-width: 760px) 90vw, 30vw" />
+                      <span className="featured-card__badge">
+                        <Status status={g.status} />
+                      </span>
+                    </Link>
+                    <div className="featured-card__row">
+                      <div>
+                        <strong>ID {g.code}</strong>
+                        <span>{[g.name, g.morph].filter(Boolean).join(' · ')}</span>
+                      </div>
+                      <Link href={href} className="featured-card__go" aria-label={`Details for ${g.name}`}>
+                        <ArrowIcon />
+                      </Link>
+                    </div>
+                    {g.status !== 'sold' ? (
+                      <a className="btn btn-primary btn-sm" href={whatsappLink(wa, message)} target="_blank" rel="noopener noreferrer">
+                        Ask via WhatsApp <BrandIcon name="whatsapp" />
+                      </a>
+                    ) : null}
+                  </li>
+                )
+              })}
+            </Carousel>
+          )}
+        </div>
+      </section>
+
       {/* Collection */}
-      <section className="band band--cream" aria-labelledby="collection-title">
+      <section className="band band--a" aria-labelledby="collection-title">
+        <Leaves side="left" />
+        <Leaves side="right" />
         <div className="band__inner collection-band">
           <div className="collection-band__copy">
-            <p className="band__kicker">The collection</p>
+            <p className="band__kicker">The Collection</p>
             <h2 id="collection-title" className="band__title">
-              Beyond for sale
+              Beyond For Sale
             </h2>
-            <p>Koleksi showcase GeckoDan: gecko pilihan yang menjadi bagian dari perjalanan kami.</p>
+            <p>GeckoDan&rsquo;s showcase collection: selected geckos that are part of our journey.</p>
             <Link className="band__more" href="/showcase">
-              Lihat koleksi <ArrowIcon />
+              View collection <ArrowIcon />
             </Link>
           </div>
           {showcase.state === 'ok' && showcase.data.length ? (
@@ -200,8 +210,8 @@ export default async function HomePage() {
             </ul>
           ) : showcase.state === 'ok' ? (
             <div className="collection-band__mosaic collection-band__mosaic--empty">
-              <PhotoSlot label="Koleksi GeckoDan" />
-              <p>Foto koleksi tampil di sini setelah ditambahkan pemilik lewat dashboard.</p>
+              <PhotoSlot label="GeckoDan collection" />
+              <p>Collection photos appear here once the owner adds them in the dashboard.</p>
             </div>
           ) : showcase.state === 'unconfigured' ? (
             <UnconfiguredNotice />
@@ -214,61 +224,63 @@ export default async function HomePage() {
       {/* Story */}
       <section className="story-band" aria-labelledby="story-title">
         <div className="story-band__photo">
-          <PhotoSlot label="Breeder GeckoDan" />
+          <PhotoSlot label="GeckoDan breeder" />
         </div>
         <div className="story-band__copy">
-          <p className="band__kicker">Our story</p>
+          <p className="band__kicker">Our Story</p>
           <h2 id="story-title" className="band__title">
-            A decade
+            A Decade
             <br />
-            of passion
+            of Passion
           </h2>
           {storyParas.length ? (
             <p>{excerpt(storyParas[0], 260)}</p>
           ) : (
             <p>
-              <span className="placeholder-tag">Konten menyusul</span> Cerita GeckoDan akan ditulis oleh pemilik.
+              <span className="placeholder-tag">Content coming soon</span> GeckoDan&rsquo;s story will be written by the owner.
             </p>
           )}
           <Link className="band__more" href="/our-story">
-            Baca cerita lengkap <ArrowIcon />
+            Read the full story <ArrowIcon />
           </Link>
         </div>
         <ul className="story-band__stats">
           <li>
             <LineIcon name="leaf" />
-            <strong>{business.experience_years ? `${business.experience_years}+` : 'Pengalaman'}</strong>
-            <span>{business.experience_years ? 'Tahun pengalaman' : 'Di dunia gecko'}</span>
+            <strong>{business.experience_years ? `${business.experience_years}+` : 'Experience'}</strong>
+            <span>{business.experience_years ? 'Years of Experience' : 'In the gecko world'}</span>
           </li>
           <li>
             <LineIcon name="diamond" />
-            <strong>Kualitas</strong>
-            <span>Selalu diutamakan</span>
+            <strong>Quality</strong>
+            <span>Always Prioritized</span>
           </li>
           <li>
             <LineIcon name="people" />
-            <strong>Komunitas</strong>
-            <span>Bagian dari perjalanan</span>
+            <strong>Community</strong>
+            <span>Part of the Journey</span>
           </li>
           <li>
             <LineIcon name="globe" />
             <strong>Pamulang</strong>
-            <span>Tangerang Selatan</span>
+            <span>South Tangerang</span>
           </li>
         </ul>
       </section>
 
       {/* Achievements: only verified entries with evidence ever appear */}
-      <section className="band band--cream band--tight" aria-labelledby="awards-title">
+      <section className="band band--b band--tight" aria-labelledby="awards-title">
+        <Leaves side="left" />
+        <Leaves side="right" />
         <div className="band__inner awards-band">
           <div className="awards-band__copy">
-            <p className="band__kicker">In the show ring</p>
+            <p className="band__kicker">In the Show Ring</p>
             <h2 id="awards-title" className="band__title">
               Achievements
             </h2>
-            <p>Dokumentasi kontes dan pencapaian GeckoDan tampil di sini setelah diverifikasi.</p>
+            <p>Competition results and milestones appear here once they are verified.</p>
             <Link className="band__more" href="/achievements">
-              Lihat semua prestasi <ArrowIcon />
+              View all achievements <ArrowIcon />
             </Link>
           </div>
           <ul className="awards-band__tiles">
@@ -283,8 +295,8 @@ export default async function HomePage() {
               : [0, 1, 2, 3].map((i) => (
                   <li key={i} className="award-tile award-tile--empty">
                     <LineIcon name="trophy" />
-                    <span>Prestasi menyusul</span>
-                    <small>Belum ada prestasi terverifikasi</small>
+                    <span>Achievement coming soon</span>
+                    <small>No verified achievements yet</small>
                   </li>
                 ))}
           </ul>
@@ -292,41 +304,43 @@ export default async function HomePage() {
       </section>
 
       {/* Reviews */}
-      <section className="band band--forest band--tight" aria-labelledby="reviews-title">
+      <section className="band band--a band--tight" aria-labelledby="reviews-title">
+        <Leaves side="left" />
+        <Leaves side="right" />
         <div className="band__inner reviews-band">
           <div>
-            <p className="band__kicker">Reviews &amp; testimonials</p>
+            <p className="band__kicker">Reviews &amp; Testimonials</p>
             <h2 id="reviews-title" className="band__title">
-              Trust from our community
+              Trust From Our Community
             </h2>
-            <p>Ulasan dari pelanggan dan komunitas.</p>
+            <p>Words from customers and the gecko community.</p>
           </div>
           <div className="reviews-band__box">
-            <h3>Google reviews</h3>
+            <h3>Google Reviews</h3>
             {readUrl || writeUrl ? (
               <>
-                <p>Baca atau tulis ulasan langsung di profil Google Business GeckoDan.</p>
+                <p>Read or write a review on GeckoDan&rsquo;s Google Business profile.</p>
                 <div className="inline-actions">
                   {readUrl ? (
                     <a className="btn btn-primary btn-sm" href={readUrl} target="_blank" rel="noopener noreferrer">
-                      Read Google reviews
+                      Read Google Reviews
                     </a>
                   ) : null}
                   {writeUrl ? (
                     <a className="btn btn-outline btn-sm" href={writeUrl} target="_blank" rel="noopener noreferrer">
-                      Write a review
+                      Write a Review
                     </a>
                   ) : null}
                 </div>
               </>
             ) : (
               <p>
-                <span className="placeholder-tag">Menunggu tautan</span> Tautan Google Reviews GeckoDan belum diatur.
+                <span className="placeholder-tag">Link pending</span> GeckoDan&rsquo;s Google Reviews link has not been set yet.
               </p>
             )}
           </div>
           <div className="reviews-band__box">
-            <h3>Customer testimonials</h3>
+            <h3>Customer Testimonials</h3>
             {firstTestimonial ? (
               <figure>
                 <blockquote>{excerpt(firstTestimonial.body, 200)}</blockquote>
@@ -336,26 +350,28 @@ export default async function HomePage() {
                 </figcaption>
               </figure>
             ) : (
-              <p>Testimoni pelanggan tampil di sini setelah mendapat izin publikasi.</p>
+              <p>Customer testimonials appear here once customers give permission to publish them.</p>
             )}
             <Link className="band__more" href="/reviews">
-              Lihat semua testimoni <ArrowIcon />
+              View all testimonials <ArrowIcon />
             </Link>
           </div>
         </div>
       </section>
 
       {/* FAQ */}
-      <section className="band band--cream band--tight" aria-labelledby="faq-title">
+      <section className="band band--b band--tight" aria-labelledby="faq-title">
+        <Leaves side="left" />
+        <Leaves side="right" />
         <div className="band__inner faq-band">
           <div>
-            <p className="band__kicker">FAQ &amp; shipping</p>
+            <p className="band__kicker">FAQ &amp; Shipping</p>
             <h2 id="faq-title" className="band__title">
-              Pertanyaan umum
+              Frequently Asked Questions
             </h2>
-            <p>Informasi seputar pemesanan, perawatan, dan pengiriman.</p>
+            <p>Information about ordering, care and shipping.</p>
             <Link className="band__more" href="/faq">
-              Semua FAQ <ArrowIcon />
+              All FAQs <ArrowIcon />
             </Link>
           </div>
           {faqItems.length ? (
@@ -373,44 +389,45 @@ export default async function HomePage() {
             </div>
           ) : (
             <p>
-              <span className="placeholder-tag">Konten menyusul</span> Jawaban pertanyaan umum sedang disiapkan. Sementara itu, tanyakan lewat WhatsApp.
+              <span className="placeholder-tag">Content coming soon</span> FAQ answers are being prepared. Meanwhile, ask us on WhatsApp.
             </p>
           )}
         </div>
       </section>
 
       {/* Contact */}
-      <section className="band band--forest band--tight" aria-labelledby="contact-title">
+      <section className="band band--a band--tight" aria-labelledby="contact-title">
+        <Leaves side="right" />
         <div className="band__inner contact-band">
           <div>
-            <p className="band__kicker">Get in touch</p>
+            <p className="band__kicker">Get in Touch</p>
             <h2 id="contact-title" className="band__title">
-              Kontak kami
+              Contact Us
             </h2>
             <p>{business.location}</p>
           </div>
-          <a className="contact-band__wa" href={whatsappLink(wa, generalInquiryMessage())} target="_blank" rel="noopener noreferrer">
+          <a className="contact-band__wa" href={whatsappLink(wa, generalInquiryMessage())} target="_blank" rel="noopener noreferrer" aria-label={`Chat with GeckoDan on WhatsApp, ${phone}`}>
             <BrandIcon name="whatsapp" />
             <span>
-              <small>Tanya via WhatsApp</small>
-              <strong>{business.whatsapp_display}</strong>
+              <small>Chat on WhatsApp</small>
+              <strong>{phone}</strong>
             </span>
             <ArrowIcon />
           </a>
           <div className="contact-band__place">
             <PinIcon />
             <span>
-              <small>Lokasi kami</small>
+              <small>Our Location</small>
               <strong>{business.location}</strong>
               {business.maps_url ? (
                 <a href={business.maps_url} target="_blank" rel="noopener noreferrer">
-                  Lihat di Google Maps
+                  View on Google Maps
                 </a>
               ) : null}
             </span>
           </div>
           <div className="contact-band__social">
-            <small>Ikuti kami</small>
+            <small>Follow Us</small>
             <ul>
               {activePlatforms(socials).map((p) => (
                 <li key={p.key}>

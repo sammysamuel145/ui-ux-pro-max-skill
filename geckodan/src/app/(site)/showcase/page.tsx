@@ -9,7 +9,7 @@ export const revalidate = 60
 
 export const metadata: Metadata = {
   title: 'Showcase',
-  description: 'Koleksi gecko GeckoDan: indukan dan hewan pilihan yang menjadi dasar setiap signature line.',
+  description: 'The GeckoDan collection: breeders and select animals that form the foundation of every signature line.',
   alternates: { canonical: '/showcase' },
 }
 
@@ -18,15 +18,15 @@ export default async function ShowcasePage() {
   return (
     <>
       <PageHead title="The Collection" tagline="A Legacy in Every Line.">
-        <p className="lead">Indukan dan gecko pilihan GeckoDan. Tidak semua dijual: status tiap gecko tertulis di halamannya.</p>
+        <p className="lead">GeckoDan&rsquo;s breeders and select geckos. Not all are for sale: each gecko&rsquo;s status is shown on its page.</p>
       </PageHead>
-      <section className="wrap" style={{ paddingBottom: 'var(--section)' }} aria-label="Koleksi">
+      <section className="wrap" style={{ paddingBottom: 'var(--section)' }} aria-label="Collection">
         {res.state === 'unconfigured' ? (
           <UnconfiguredNotice />
         ) : res.state === 'error' ? (
           <ErrorNotice />
         ) : res.data.length === 0 ? (
-          <PendingContent>Foto koleksi akan tampil di sini setelah ditambahkan pemilik lewat dashboard.</PendingContent>
+          <PendingContent>Collection photos will appear here once the owner adds them through the dashboard.</PendingContent>
         ) : (
           <div className="showcase-grid">
             {res.data.map((g) => (
@@ -37,7 +37,7 @@ export default async function ShowcasePage() {
                 <span className="showcase-item__name">{g.name}</span>
                 <span className="small soft">
                   ID {g.code}
-                  {g.line ? ` · Line ${g.line.name}` : ''}
+                  {g.line ? ` · ${g.line.name} line` : ''}
                 </span>
               </Link>
             ))}

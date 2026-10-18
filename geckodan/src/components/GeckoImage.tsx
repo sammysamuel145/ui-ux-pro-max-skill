@@ -17,17 +17,17 @@ export function GeckoImage({ photo, name, sizes, preload }: Props) {
   const src = mediaUrl(photo?.storage_path)
   if (!photo || !src) {
     return (
-      <div className="plate" role="img" aria-label={`Foto ${name} belum tersedia`}>
+      <div className="plate" role="img" aria-label={`Photo of ${name} not yet available`}>
         <img src="/brand/geckodan-logo-256.png" alt="" width={256} height={242} />
         <strong>{name}</strong>
-        <span className="small">Foto menyusul</span>
+        <span className="small">Photo coming soon</span>
       </div>
     )
   }
   return (
     <Image
       src={src}
-      alt={photo.alt || `Foto ${name}`}
+      alt={photo.alt || `Photo of ${name}`}
       fill
       sizes={sizes}
       preload={preload}

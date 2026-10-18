@@ -48,7 +48,6 @@ export default async function AdminSettingsPage() {
             <Text id="business.location" label="Lokasi" value={business.location} required maxLength={200} />
           </div>
           <div className="row">
-            <Text id="business.whatsapp_display" label="Nomor WhatsApp (tampilan)" value={business.whatsapp_display} required maxLength={40} />
             <Text
               id="business.whatsapp_number"
               label="Nomor WhatsApp (untuk tautan)"

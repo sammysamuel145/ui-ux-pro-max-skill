@@ -14,8 +14,8 @@ describe('text helpers', () => {
     expect(e.length).toBeLessThanOrEqual(41)
     expect(e.endsWith('…')).toBe(true)
   })
-  it('formats dates in Indonesian without timezone drift', () => {
-    expect(formatDate('2024-03-01')).toBe('1 Maret 2024')
+  it('formats dates in English (en-GB) without timezone drift', () => {
+    expect(formatDate('2024-03-01')).toBe('1 March 2024')
     expect(formatDate('nope')).toBeNull()
   })
 })

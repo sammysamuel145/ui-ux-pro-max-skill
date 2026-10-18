@@ -5,8 +5,7 @@ import type { SiteSettings } from './types'
 export const DEFAULT_SETTINGS: SiteSettings = {
   business: {
     brand: 'GeckoDan',
-    location: 'Pamulang, Tangerang Selatan, Indonesia',
-    whatsapp_display: '0851 7441 3278',
+    location: 'Pamulang, South Tangerang, Indonesia',
     whatsapp_number: '6285174413278',
     maps_url: 'https://share.google/djs93Utk6ol35s2kV',
     google_reviews_url: '',
@@ -25,7 +24,7 @@ export const DEFAULT_SETTINGS: SiteSettings = {
     eyebrow: 'Premium Gecko Breeder',
     headline: 'A Decade of Passion.',
     tagline: 'A Legacy in Every Line.',
-    body: 'Lebih dari 10 tahun berkecimpung di dunia gecko, menghadirkan kualitas, karakter, dan dedikasi di setiap generasi.',
+    body: 'More than 10 years in the gecko world, bringing quality, character and dedication to every generation.',
     cta_label: 'Explore Our Geckos',
     cta_href: '/geckos',
     image_path: '',
@@ -37,7 +36,7 @@ export const DEFAULT_SETTINGS: SiteSettings = {
   seo: {
     site_title: 'GeckoDan',
     default_description:
-      'GeckoDan, breeder leopard gecko premium di Pamulang, Tangerang Selatan. Lihat gecko yang tersedia dan tanyakan langsung lewat WhatsApp.',
+      'GeckoDan, a premium leopard gecko breeder in Pamulang, South Tangerang. See the geckos available and ask directly on WhatsApp.',
     og_image_path: '',
   },
 }
