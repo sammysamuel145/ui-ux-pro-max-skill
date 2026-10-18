@@ -1652,95 +1652,54 @@ textarea {
 /* ---------- Footer ---------- */
 
 .site-footer {
-  position: relative;
-  overflow: hidden;
-  min-height: 100svh;
-  display: grid;
-  /* Keeps the oversized wordmark from widening the column the content sits in. */
-  grid-template-columns: minmax(0, 1fr);
-  align-content: space-between;
-  padding-top: var(--section);
-  background: var(--night);
+  background: #000503;
   color: var(--on-night);
 }
 
-.site-footer__top {
-  display: grid;
-  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
-  gap: 48px;
+.site-footer__bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 32px;
+  width: min(1240px, 100% - 2 * var(--margin));
+  margin-inline: auto;
+  padding-block: 20px;
 }
 
-.site-footer__invite {
-  font-family: var(--font-display);
-  font-size: clamp(2.5rem, 1.2rem + 4.4vw, 5rem);
-  line-height: 1;
-  text-transform: uppercase;
-}
-
-.site-footer__invite + .btn {
-  margin-top: 32px;
-}
-
-.footer-links {
-  display: grid;
-  gap: 4px;
-  align-content: start;
-}
-
-.footer-links a {
-  display: inline-flex;
+.site-footer__brand {
+  display: flex;
   align-items: center;
   gap: 12px;
-  min-height: 44px;
+  font-family: var(--font-display);
+  letter-spacing: 0.22em;
   text-decoration: none;
 }
 
-.footer-links svg {
-  width: 18px;
-  height: 18px;
-  fill: currentColor;
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .footer-links a:hover {
-    color: var(--orange);
-  }
-}
-
-.site-footer__legal {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 8px 24px;
-  margin-top: 64px;
-  font-size: 0.875rem;
+.site-footer__tag {
+  font-size: 0.75rem;
   color: var(--on-night-soft);
 }
 
-.site-footer__legal a {
-  color: inherit;
+.site-footer ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 20px;
 }
 
-.site-footer__name {
-  margin: 0;
-  font-family: var(--font-display);
-  font-size: clamp(5rem, 24vw, 26rem);
-  line-height: 0.8;
-  letter-spacing: -0.01em;
-  white-space: nowrap;
-  color: var(--night-3);
-  transform: translateY(14%);
-  user-select: none;
+.site-footer ul a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-size: 0.75rem;
+  text-decoration: none;
+  color: var(--on-night-soft);
 }
 
-@media (max-width: 860px) {
-  .site-footer__top {
-    grid-template-columns: 1fr;
-  }
-  .site-footer .btn {
-    width: 100%;
-  }
+.site-footer ul a:hover {
+  color: var(--on-night);
 }
+
 
 /* ---------- Motion: entrances on scroll, CSS only ---------- */
 
