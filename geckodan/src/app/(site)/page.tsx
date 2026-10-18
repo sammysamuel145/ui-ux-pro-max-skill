@@ -1,5 +1,6 @@
 import Image from 'next/image'
 import Link from 'next/link'
+import { BusinessJsonLd } from '@/components/BusinessJsonLd'
 import { Coupon } from '@/components/Coupon'
 import { GeckoImage } from '@/components/GeckoImage'
 import { Hero } from '@/components/Hero'
@@ -39,6 +40,7 @@ export default async function HomePage() {
 
   return (
     <>
+      <BusinessJsonLd settings={settings} />
       <Hero settings={settings} />
 
       {/* Featured available geckos, set as the breeder's printed availability sheet */}

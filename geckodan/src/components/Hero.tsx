@@ -34,7 +34,7 @@ export function Hero({ settings }: { settings: SiteSettings }) {
       </div>
       <div className="wrap hero__inner">
         <div className="hero__copy">
-          <p className="eyebrow">{hero.eyebrow}</p>
+          <p className="eyebrow" /* taste-skill-ignore: shown in the approved hero reference */>{hero.eyebrow}</p>
           <h1 id="hero-title" className="display">
             {line1}
             {line2 ? (

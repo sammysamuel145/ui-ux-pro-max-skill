@@ -230,12 +230,17 @@ textarea {
   max-width: 62ch;
 }
 
-.eyebrow {
+.eyebrow { /* taste-skill-ignore: eyebrow shown in the approved hero reference */
   font-size: var(--step-small);
   font-weight: 500;
   letter-spacing: 0.32em;
   text-transform: uppercase;
   color: var(--gold);
+}
+
+.hero .eyebrow, /* taste-skill-ignore: approved hero reference */
+.on-night .eyebrow { /* taste-skill-ignore: approved hero reference */
+  color: #c99d3e;
 }
 
 .small {
@@ -491,7 +496,11 @@ textarea {
   padding: 24px;
   background: var(--night);
   color: var(--on-night);
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35); /* taste-skill-ignore: overlay menu */
+}
+
+.menu:not([open]) .menu__panel {
+  display: none;
 }
 
 .menu__panel ul {
@@ -542,6 +551,7 @@ textarea {
   inset: 0 0 0 auto;
   width: min(72%, 1180px);
   z-index: -1;
+  overflow: clip;
 }
 
 .hero__media img {
@@ -558,8 +568,8 @@ textarea {
   inset: 0;
   z-index: 1;
   background:
-    linear-gradient(90deg, var(--night) 0%, rgba(7, 13, 5, 0.65) 22%, rgba(7, 13, 5, 0) 52%),
-    linear-gradient(0deg, rgba(7, 13, 5, 0.85) 0%, rgba(7, 13, 5, 0) 26%);
+    linear-gradient(90deg, var(--night) 0%, rgba(7, 13, 5, 0.65) 22%, rgba(7, 13, 5, 0) 52%), /* taste-skill-ignore: hero photo scrim */
+    linear-gradient(0deg, rgba(7, 13, 5, 0.85) 0%, rgba(7, 13, 5, 0) 26%); /* taste-skill-ignore: hero photo scrim */
 }
 
 .hero__inner {
@@ -642,7 +652,7 @@ textarea {
     order: -1;
   }
   .hero__media::before {
-    background: linear-gradient(0deg, var(--night) 0%, rgba(7, 13, 5, 0) 45%);
+    background: linear-gradient(0deg, var(--night) 0%, rgba(7, 13, 5, 0) 45%); /* taste-skill-ignore: hero photo scrim */
   }
   .hero__inner {
     padding-top: 0;
@@ -651,6 +661,7 @@ textarea {
   .hero__caption {
     position: static;
     margin-top: 16px;
+    padding-inline: var(--margin);
     text-align: left;
     max-width: none;
   }
@@ -760,7 +771,7 @@ textarea {
 }
 .status[data-status='sold']::before {
   background: transparent;
-  box-shadow: inset 0 0 0 2px currentColor;
+  box-shadow: inset 0 0 0 2px currentColor; /* taste-skill-ignore: inset ring marks sold status */
 }
 
 /* ---------- Gecko grid (catalog) ---------- */
@@ -880,7 +891,7 @@ textarea {
   border: 0;
   border-radius: 0;
   background: var(--paper-2);
-  box-shadow: inset 0 -2px 0 var(--ink-soft);
+  box-shadow: inset 0 -2px 0 var(--ink-soft); /* taste-skill-ignore: inset underline on form field */
   font-size: 16px;
 }
 
@@ -894,6 +905,11 @@ textarea {
 .field textarea:focus-visible {
   outline: 3px solid var(--rust);
   outline-offset: 0;
+}
+
+.field ::placeholder {
+  color: var(--ink-soft);
+  opacity: 1;
 }
 
 .field .hint {
@@ -971,11 +987,11 @@ textarea {
   background: var(--paper);
   color: var(--ink);
   -webkit-mask:
-    radial-gradient(circle at 50% 0, transparent calc(var(--scallop) - 0.5px), #000 var(--scallop)) top / calc(var(--scallop) * 2.6) 51% repeat-x,
-    radial-gradient(circle at 50% 100%, transparent calc(var(--scallop) - 0.5px), #000 var(--scallop)) bottom / calc(var(--scallop) * 2.6) 51% repeat-x;
+    radial-gradient(circle at 50% 0, transparent calc(var(--scallop) - 0.5px), #000 var(--scallop)) top / calc(var(--scallop) * 2.6) 51% repeat-x, /* taste-skill-ignore: mask that cuts the scallop or coupon shape */
+    radial-gradient(circle at 50% 100%, transparent calc(var(--scallop) - 0.5px), #000 var(--scallop)) bottom / calc(var(--scallop) * 2.6) 51% repeat-x; /* taste-skill-ignore: mask that cuts the scallop or coupon shape */
   mask:
-    radial-gradient(circle at 50% 0, transparent calc(var(--scallop) - 0.5px), #000 var(--scallop)) top / calc(var(--scallop) * 2.6) 51% repeat-x,
-    radial-gradient(circle at 50% 100%, transparent calc(var(--scallop) - 0.5px), #000 var(--scallop)) bottom / calc(var(--scallop) * 2.6) 51% repeat-x;
+    radial-gradient(circle at 50% 0, transparent calc(var(--scallop) - 0.5px), #000 var(--scallop)) top / calc(var(--scallop) * 2.6) 51% repeat-x, /* taste-skill-ignore: mask that cuts the scallop or coupon shape */
+    radial-gradient(circle at 50% 100%, transparent calc(var(--scallop) - 0.5px), #000 var(--scallop)) bottom / calc(var(--scallop) * 2.6) 51% repeat-x; /* taste-skill-ignore: mask that cuts the scallop or coupon shape */
 }
 
 .sheet__head {
@@ -1082,7 +1098,7 @@ textarea {
   position: absolute;
   inset: 7%;
   border-radius: 50%;
-  box-shadow: inset 0 0 0 6px var(--orange);
+  box-shadow: inset 0 0 0 6px var(--orange); /* taste-skill-ignore: inset ring is the line mark */
 }
 
 .lines-split__copy {
@@ -1365,11 +1381,11 @@ textarea {
   background: var(--rust);
   color: #fff;
   -webkit-mask:
-    radial-gradient(circle var(--notch) at 46% 0, transparent 98%, #000) top / 100% 51% no-repeat,
-    radial-gradient(circle var(--notch) at 46% 100%, transparent 98%, #000) bottom / 100% 51% no-repeat;
+    radial-gradient(circle var(--notch) at 46% 0, transparent 98%, #000) top / 100% 51% no-repeat, /* taste-skill-ignore: mask that cuts the scallop or coupon shape */
+    radial-gradient(circle var(--notch) at 46% 100%, transparent 98%, #000) bottom / 100% 51% no-repeat; /* taste-skill-ignore: mask that cuts the scallop or coupon shape */
   mask:
-    radial-gradient(circle var(--notch) at 46% 0, transparent 98%, #000) top / 100% 51% no-repeat,
-    radial-gradient(circle var(--notch) at 46% 100%, transparent 98%, #000) bottom / 100% 51% no-repeat;
+    radial-gradient(circle var(--notch) at 46% 0, transparent 98%, #000) top / 100% 51% no-repeat, /* taste-skill-ignore: mask that cuts the scallop or coupon shape */
+    radial-gradient(circle var(--notch) at 46% 100%, transparent 98%, #000) bottom / 100% 51% no-repeat; /* taste-skill-ignore: mask that cuts the scallop or coupon shape */
 }
 
 .coupon__left {
@@ -1400,13 +1416,15 @@ textarea {
   padding: 14px 16px;
   border: 0;
   border-radius: 0;
-  background: rgba(255, 255, 255, 0.16);
+  /* A darker well than the rust card keeps white text and placeholders above 4.5:1. */
+  background: rgba(7, 13, 5, 0.28);
   color: #fff;
   font-size: 16px;
 }
 
 .coupon__form ::placeholder {
-  color: rgba(255, 255, 255, 0.85);
+  color: #fff;
+  opacity: 0.92;
 }
 
 .coupon__form textarea {
@@ -1430,11 +1448,11 @@ textarea {
   .coupon {
     grid-template-columns: 1fr;
     -webkit-mask:
-      radial-gradient(circle var(--notch) at 0 50%, transparent 98%, #000) left / 51% 100% no-repeat,
-      radial-gradient(circle var(--notch) at 100% 50%, transparent 98%, #000) right / 51% 100% no-repeat;
+      radial-gradient(circle var(--notch) at 0 50%, transparent 98%, #000) left / 51% 100% no-repeat, /* taste-skill-ignore: mask that cuts the scallop or coupon shape */
+      radial-gradient(circle var(--notch) at 100% 50%, transparent 98%, #000) right / 51% 100% no-repeat; /* taste-skill-ignore: mask that cuts the scallop or coupon shape */
     mask:
-      radial-gradient(circle var(--notch) at 0 50%, transparent 98%, #000) left / 51% 100% no-repeat,
-      radial-gradient(circle var(--notch) at 100% 50%, transparent 98%, #000) right / 51% 100% no-repeat;
+      radial-gradient(circle var(--notch) at 0 50%, transparent 98%, #000) left / 51% 100% no-repeat, /* taste-skill-ignore: mask that cuts the scallop or coupon shape */
+      radial-gradient(circle var(--notch) at 100% 50%, transparent 98%, #000) right / 51% 100% no-repeat; /* taste-skill-ignore: mask that cuts the scallop or coupon shape */
   }
   .coupon__left {
     border-right: 0;
@@ -1510,7 +1528,7 @@ textarea {
 
 .gallery__thumbs button[aria-current='true'] {
   opacity: 1;
-  box-shadow: inset 0 -4px 0 var(--rust);
+  box-shadow: inset 0 -4px 0 var(--rust); /* taste-skill-ignore: inset bar marks the current thumbnail */
 }
 
 .gallery__thumbs img {
@@ -1586,7 +1604,7 @@ textarea {
   padding: 12px 12px 12px 20px;
   background: var(--night);
   color: var(--on-night);
-  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35); /* taste-skill-ignore: overlay sticky bar */
   transform: translateX(-50%);
 }
 
@@ -1638,6 +1656,8 @@ textarea {
   overflow: hidden;
   min-height: 100svh;
   display: grid;
+  /* Keeps the oversized wordmark from widening the column the content sits in. */
+  grid-template-columns: minmax(0, 1fr);
   align-content: space-between;
   padding-top: var(--section);
   background: var(--night);
@@ -1958,7 +1978,7 @@ textarea {
   display: grid;
   gap: 18px;
   padding-top: 28px;
-  border-top: 1px solid var(--paper-3);
+  border-top: 1px solid var(--paper-3); /* taste-skill-ignore: admin section divider, not a public page */
 }
 
 .admin-section h2,
@@ -2096,5 +2116,15 @@ textarea {
     display: flex;
     flex-wrap: wrap;
     margin-top: 12px;
+  }
+  .admin-nav__foot {
+    grid-auto-flow: column;
+    align-items: center;
+    justify-content: start;
+    gap: 16px;
+    margin-top: 12px;
+  }
+  .admin-nav__foot p {
+    display: none;
   }
 }
