@@ -116,3 +116,160 @@ Never push directly to `main`. Always:
 2. Commit changes
 3. Push branch: `git push -u origin <branch>`
 4. Create PR: `gh pr create`
+
+---
+
+## GeckoDan Project Instructions
+
+These instructions apply to all work on the GeckoDan website. They are additional to, and do not change, the UI UX Pro Max instructions above. Work on the UI UX Pro Max toolkit itself still follows the sections above.
+
+### Project Identity
+
+GeckoDan is a premium gecko breeder brand based in Pamulang, Tangerang Selatan, Indonesia.
+
+The website showcases geckos available for sale, collection geckos, signature breeding lines, breeder history, verified achievements, and customer trust information. All purchase inquiries are directed to WhatsApp.
+
+### Core Principles
+
+- Build a functional, production-quality website, not just a visual mockup.
+- Inspect existing code before modifying it.
+- Reuse the current framework, dependencies, and integrations when appropriate.
+- Preserve unrelated working functionality.
+- Avoid unnecessary rewrites, dependencies, and architectural complexity.
+- Never claim a feature works unless it has been implemented and tested.
+- Never fabricate photographs, gecko information, lineage, competition awards, reviews, ratings, or testimonials.
+- Use clearly marked placeholders for missing authentic content.
+- Do not expose credentials, API keys, service-role keys, or private customer data.
+
+### Design Direction
+
+The approved homepage direction is cinematic wildlife editorial, inspired by the user's reference featuring an orange leopard gecko in a lush tropical environment.
+
+The user has approved a hero concept with:
+
+- A prominent leopard gecko visual.
+- Cinematic natural lighting and tropical foliage.
+- Editorial typography.
+- Minimal navigation.
+- The headline concept "A DECADE OF PASSION".
+- The supporting line "A Legacy in Every Line".
+- An "EXPLORE OUR GECKOS" call to action.
+
+Follow the user's supplied visual reference for colors. Do not invent a new palette.
+
+The overall website should maintain a light editorial premium aesthetic outside the cinematic hero. Prioritize image quality, whitespace, typography, accessibility, mobile usability, and visual consistency.
+
+Use the real GeckoDan logo and photographs when provided. Never present generated imagery as an authentic GeckoDan animal.
+
+### Claude Skills
+
+When relevant and actually available, inspect and follow the installed instructions for:
+
+- UI UX Pro Max: information architecture, usability, responsive design, accessibility.
+- Taste: visual direction, composition, typography, and design quality.
+- Emil Kowalski: purposeful motion and interaction design.
+- Impeccable: interface polish, consistency, and quality assurance.
+
+Do not assume these skills are installed. Verify their locations and follow their actual instructions. Never claim to have used an unavailable skill.
+
+At the time this section was written, the skill folders in this repository were `.claude/skills/ui-ux-pro-max`, `.claude/skills/taste-skill`, `.claude/skills/emil-design-eng`, and `.claude/skills/impeccable`. Check that they still exist before relying on them. These skills can disagree with each other, so choose one lead for design direction and use the others for support.
+
+### Product Requirements
+
+The website should support:
+
+- Homepage and cinematic hero.
+- Searchable, filterable gecko catalog.
+- Individual gecko detail pages.
+- Separate for-sale and showcase visibility.
+- MANTRA, KAFKA, and VALKRIE signature lines.
+- Gecko photo galleries.
+- Pedigree or lineage information when available.
+- Breeder story and verified achievements.
+- Google Reviews links and genuine testimonials.
+- FAQ and shipping information.
+- Individual social media and contact links.
+- Secure owner-only admin dashboard.
+- Admin management of geckos, photos, signature lines, awards, testimonials, FAQs, site settings, and SEO metadata.
+- WhatsApp inquiries with prefilled messages.
+- SEO-friendly public pages.
+
+Public prices must remain hidden unless the owner explicitly changes this requirement.
+
+### Business Information
+
+Brand: GeckoDan
+Location: Pamulang, Tangerang Selatan, Indonesia
+WhatsApp: 085174413278
+International WhatsApp URL: https://wa.me/6285174413278
+
+Google Maps:
+https://share.google/djs93Utk6ol35s2kV
+
+Facebook:
+https://www.facebook.com/share/1C2cfuuTPd/?mibextid=wwXIfr
+
+TikTok:
+https://www.tiktok.com/@geckodan_?_r=1&_t=ZS-9AeXmIbtv5Z
+
+Instagram:
+https://www.instagram.com/geck_dan?vrfl=M24zYnlqMXZhMDFv
+
+YouTube:
+https://youtube.com/@joreptile?si=hS67ZZWEuqj8zZTC
+
+Tokopedia:
+https://tk.tokopedia.com/ZSg6qxxMf/
+
+Experience: approximately 10 years in the gecko world, subject to owner-approved wording.
+
+### Technical Requirements
+
+- Follow the existing repository's framework and coding conventions.
+- Use TypeScript where consistent with the existing stack.
+- Keep components modular and maintainable.
+- Use a real database and persistent storage for production content.
+- If Supabase is used, enforce appropriate Row Level Security and Storage policies.
+- Protect admin routes and enforce authorization on the server or database.
+- Never permit public admin registration.
+- Never expose service-role credentials in client-side code.
+- Validate user-controlled inputs and handle errors safely.
+- Do not connect to an unrelated application's production database.
+- Do not commit secrets or local environment files.
+
+### Content and Data Integrity
+
+- Distinguish available, reserved, and sold geckos.
+- Do not assume unknown morphs, sex, age, pedigree, or breeding history.
+- Publish awards only when evidence is available.
+- Publish testimonials only with appropriate permission.
+- Use real Google reviews and verified business profile links.
+- Do not invent shipping methods, guarantees, or policies.
+- Clearly identify temporary placeholders and remove or replace them before launch.
+
+### WhatsApp and External Links
+
+- Every social platform must have its own clearly labeled link or button.
+- Verify external destinations.
+- Gecko inquiries should include the gecko name, ID, and detail URL.
+- Do not claim an inquiry is a completed purchase.
+- No payment gateway or WhatsApp Business API is required for the initial version.
+
+### Development Workflow
+
+1. Inspect the existing implementation before making changes.
+2. Identify the smallest appropriate implementation steps.
+3. Implement features in logical, testable milestones.
+4. Run relevant tests and build checks after meaningful changes.
+5. Fix regressions introduced by the implementation.
+6. Review responsive behavior, accessibility, performance, and security.
+7. Document missing configuration and unresolved issues.
+8. Avoid destructive Git operations and preserve unrelated changes.
+
+### Definition of Done
+
+A feature is complete only when it works as intended, has been tested where feasible, and has no unresolved critical security issues.
+
+Before launch, verify the public website, catalog, WhatsApp links, admin authorization, photo uploads, database policies, external links, SEO metadata, mobile layouts, and authentic content.
+
+Do not mark the project production-ready while required security configuration, essential content, or critical tests remain unresolved.
