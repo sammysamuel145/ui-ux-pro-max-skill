@@ -23,7 +23,11 @@ export default async function GeckosPage({ searchParams }: Props) {
 
   return (
     <>
-      <PageHead title="Our Geckos" tagline="A Legacy in Every Line.">
+      <PageHead
+        title="Our Geckos"
+        tagline="A Legacy in Every Line."
+        action={{ label: 'Ask about stock', href: whatsappLink(settings.business.whatsapp_number, generalInquiryMessage()), external: true }}
+      >
         <p className="lead">Geckos available for purchase. Prices are not shown: ask directly on WhatsApp.</p>
       </PageHead>
       <section className="wrap" style={{ paddingBottom: 'var(--section)' }} aria-label="Catalogue">

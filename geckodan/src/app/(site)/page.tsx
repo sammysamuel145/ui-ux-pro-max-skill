@@ -1,6 +1,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { BusinessJsonLd } from '@/components/BusinessJsonLd'
+import { FeaturedCarousel } from '@/components/FeaturedCarousel'
 import { GeckoImage } from '@/components/GeckoImage'
 import { Hero } from '@/components/Hero'
 import { ArrowIcon, BrandIcon } from '@/components/Icons'
@@ -124,46 +125,36 @@ export default async function HomePage() {
                 </p>
               </div>
             ) : (
-              <>
-              <ul className="catalog__grid">
+              <FeaturedCarousel label="Featured geckos" endHref="/geckos" endLabel="See every gecko">
                 {featured.data.map((g) => {
                   const href = `/geckos/${g.slug}`
                   const message = geckoInquiryMessage({ name: g.name, code: g.code, url: `${base}${href}` })
                   return (
-                    <li key={g.id} className="gecko rv">
+                    <li key={g.id} className="gecko">
                       <Link href={href} className="gecko__photo" aria-label={`View ${g.name}`}>
-                        <GeckoImage photo={g.photos[0]} name={g.name} sizes="(max-width: 700px) 92vw, (max-width: 1100px) 46vw, 30vw" />
+                        <GeckoImage photo={g.photos[0]} name={g.name} sizes="(max-width: 700px) 78vw, (max-width: 1100px) 44vw, 28vw" />
                       </Link>
                       <div className="gecko__body">
+                        <Status status={g.status} />
                         <h3 className="gecko__name">
                           <Link href={href}>{g.name}</Link>
                         </h3>
-                        <Status status={g.status} />
                         <p className="gecko__meta">{[`ID ${g.code}`, g.morph, g.line?.name].filter(Boolean).join(' · ')}</p>
                         <p className="gecko__actions">
+                          <Link href={href} className="pill">
+                            Details
+                          </Link>
                           {g.status !== 'sold' ? (
                             <a href={whatsappLink(wa, message)} target="_blank" rel="noopener noreferrer" className="text-arrow">
                               <BrandIcon name="whatsapp" /> Ask on WhatsApp
                             </a>
                           ) : null}
-                          <Link href={href} className="text-arrow text-arrow--quiet">
-                            Details <ArrowIcon />
-                          </Link>
                         </p>
                       </div>
                     </li>
                   )
                 })}
-              </ul>
-                <div className="catalog__all">
-                  <Link href="/geckos" className="arrow-cta" aria-label="See every gecko in the full catalog">
-                    <span>See every gecko</span>
-                    <span className="arrow-cta__circle" aria-hidden="true">
-                      <ArrowIcon />
-                    </span>
-                  </Link>
-                </div>
-              </>
+              </FeaturedCarousel>
             )}
           </div>
         </section>

@@ -17,7 +17,7 @@ export default async function ShowcasePage() {
   const res = await showcaseGeckos()
   return (
     <>
-      <PageHead title="The Collection" tagline="A Legacy in Every Line.">
+      <PageHead title="The Collection" tagline="A Legacy in Every Line." action={{ label: 'Geckos for sale', href: '/geckos' }}>
         <p className="lead">GeckoDan&rsquo;s breeders and select geckos. Not all are for sale: each gecko&rsquo;s status is shown on its page.</p>
       </PageHead>
       <section className="wrap" style={{ paddingBottom: 'var(--section)' }} aria-label="Collection">

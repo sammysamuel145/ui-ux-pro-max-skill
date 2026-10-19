@@ -217,17 +217,12 @@
   max-width: 34ch;
 }
 
-.catalog__grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: clamp(2rem, 4vw, 3.5rem) clamp(1rem, 2.4vw, 2.25rem);
-}
-
 .gecko__photo {
   position: relative;
   display: block;
   aspect-ratio: 4 / 5;
   overflow: hidden;
+  border-radius: var(--radius-card);
   background: var(--tile);
 }
 
@@ -244,7 +239,9 @@
 .gecko__body {
   display: grid;
   gap: 6px;
-  padding-top: 16px;
+  justify-items: center;
+  padding-top: 18px;
+  text-align: center;
 }
 
 .gecko__name {
@@ -265,8 +262,119 @@
 .gecko__actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 0 1.5rem;
-  margin-top: 6px;
+  gap: 0 1.25rem;
+  align-items: center;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+/* ---------- Featured carousel: slides sideways, arrows at the far end ---------- */
+
+.fc__track {
+  display: flex;
+  gap: clamp(1rem, 2vw, 1.75rem);
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  /* The row runs to the right edge of the screen so the next card peeks in. */
+  margin-right: calc(50% - 50vw);
+  padding-right: calc(50vw - 50%);
+}
+
+.fc__track::-webkit-scrollbar {
+  display: none;
+}
+
+.fc__track > li {
+  flex: 0 0 clamp(250px, 29vw, 400px);
+  scroll-snap-align: start;
+}
+
+.fc__end a {
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 1.25rem;
+  height: 100%;
+  min-height: 320px;
+  padding: 2rem;
+  border-radius: var(--radius-card);
+  background: var(--forest-c);
+  text-decoration: none;
+  color: var(--on-night);
+  text-align: center;
+}
+
+.fc__end-circle {
+  display: grid;
+  place-items: center;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: var(--rust);
+  color: #fff;
+  transition: transform 220ms var(--ease-out), background-color 160ms ease;
+}
+
+.fc__end-circle .arrow {
+  width: 26px;
+  height: 16px;
+}
+
+.fc__end-text {
+  font-family: var(--font-display);
+  font-size: 1.375rem;
+}
+
+.fc__end a:active {
+  transform: scale(0.98);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .fc__end a:hover .fc__end-circle {
+    background: var(--rust-deep);
+    transform: translateX(6px);
+  }
+}
+
+.fc__controls {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: clamp(1.5rem, 3vw, 2.25rem);
+}
+
+.fc__btn {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(244, 244, 240, 0.12);
+  color: var(--on-night);
+  cursor: pointer;
+  transition: background-color 160ms ease, opacity 160ms ease, transform 160ms var(--ease-out);
+}
+
+.fc__btn svg {
+  width: 18px;
+  height: 12px;
+}
+
+.fc__btn:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+.fc__btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .fc__btn:hover:not(:disabled) {
+    background: rgba(244, 244, 240, 0.22);
+  }
 }
 
 .catalog__empty {
@@ -287,55 +395,6 @@
   gap: 16px;
   justify-items: start;
   max-width: 44ch;
-}
-
-/* ---------- Link to the full catalog ---------- */
-
-.catalog__all {
-  display: flex;
-  justify-content: center;
-  margin-top: clamp(2.5rem, 5vw, 4rem);
-}
-
-.arrow-cta {
-  display: inline-flex;
-  align-items: center;
-  gap: 1rem;
-  min-height: 56px;
-  font-size: 0.8125rem;
-  font-weight: 600;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  text-decoration: none;
-  color: var(--on-night);
-  transition: transform 160ms var(--ease-out);
-}
-
-.arrow-cta__circle {
-  display: grid;
-  place-items: center;
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: var(--rust);
-  color: #fff;
-  transition: transform 200ms var(--ease-out), background-color 160ms ease;
-}
-
-.arrow-cta__circle .arrow {
-  width: 22px;
-  height: 14px;
-}
-
-.arrow-cta:active {
-  transform: scale(0.97);
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .arrow-cta:hover .arrow-cta__circle {
-    background: var(--rust-deep);
-    transform: translateX(4px);
-  }
 }
 
 /* ---------- Signature lines: a typographic index ---------- */
@@ -435,6 +494,7 @@
   position: relative;
   aspect-ratio: 4 / 5;
   overflow: hidden;
+  border-radius: var(--radius-card);
   background: var(--tile);
 }
 
@@ -512,6 +572,7 @@
 .shot {
   position: relative;
   overflow: hidden;
+  border-radius: var(--radius-card);
   background: var(--tile);
 }
 
@@ -649,6 +710,7 @@
 .story__photo {
   aspect-ratio: 1 / 1;
   overflow: hidden;
+  border-radius: var(--radius-card);
 }
 
 .achv {
@@ -746,6 +808,7 @@
 }
 
 .faq__item {
+  border-radius: 18px;
   background: rgba(244, 244, 240, 0.04);
   transition: background-color 160ms ease;
 }
@@ -828,9 +891,6 @@
 /* ---------- Responsive ---------- */
 
 @media (max-width: 1000px) {
-  .catalog__grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
   .story__grid,
   .info__grid {
     grid-template-columns: 1fr;
@@ -867,8 +927,8 @@
 }
 
 @media (max-width: 700px) {
-  .catalog__grid {
-    grid-template-columns: 1fr;
+  .fc__track > li {
+    flex-basis: 78%;
   }
   .catalog__empty {
     grid-template-columns: 1fr;

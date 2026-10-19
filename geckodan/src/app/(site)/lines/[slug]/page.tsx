@@ -61,7 +61,11 @@ export default async function LinePage({ params }: Props) {
 
   return (
     <>
-      <PageHead title={line.name} tagline={line.tagline ?? 'A GeckoDan signature line'} />
+      <PageHead
+        title={line.name}
+        tagline={line.tagline ?? 'A GeckoDan signature line'}
+        action={{ label: `${line.name} geckos`, href: `/geckos?line=${line.slug}` }}
+      />
       <section className="wrap" style={{ display: 'grid', gap: 48, paddingBottom: 'var(--section)' }}>
         {cover ? (
           <div style={{ position: 'relative', aspectRatio: '16 / 9', background: 'var(--paper-3)' }}>

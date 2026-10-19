@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
-import Image from 'next/image'
 import { PendingContent } from '@/components/Notices'
+import { PageHead } from '@/components/PageHead'
 import { getSettings } from '@/lib/data/public'
 import { paragraphs } from '@/lib/text'
 
@@ -16,27 +16,27 @@ export default async function StoryPage() {
   const settings = await getSettings()
   const body = paragraphs(settings.story.body)
   return (
-    <section className="letter-band" aria-labelledby="story-title" style={{ paddingTop: 'clamp(48px, 8vw, 112px)' }}>
-      <article className="letter reveal">
-        <Image className="letter__logo" src="/brand/geckodan-logo-256.png" alt="" width={256} height={242} />
-        <h1 id="story-title" className="headline" style={{ marginTop: 24, textTransform: 'uppercase' }}>
-          {settings.story.title || 'Our Story'}
-        </h1>
-        <p className="tagline soft" style={{ marginTop: 12 }}>
-          A Decade of Passion.
-        </p>
-        <div className="prose">
-          {body.length ? (
-            body.map((p, i) => <p key={i}>{p}</p>)
-          ) : (
-            <PendingContent>
-              The GeckoDan story will be written by the owner: how it all began, about ten years in the gecko world, and
-              what is sought in every generation.
-            </PendingContent>
-          )}
-        </div>
-        {settings.story.signature ? <p className="letter__sign">{settings.story.signature}</p> : null}
-      </article>
-    </section>
+    <>
+      <PageHead
+        title={settings.story.title || 'Our Story'}
+        tagline="A Decade of Passion."
+        action={{ label: 'Explore our geckos', href: '/geckos' }}
+      />
+      <section className="letter-band" aria-label="Story" style={{ paddingTop: 'clamp(16px, 3vw, 40px)' }}>
+        <article className="letter reveal">
+          <div className="prose">
+            {body.length ? (
+              body.map((p, i) => <p key={i}>{p}</p>)
+            ) : (
+              <PendingContent>
+                The GeckoDan story will be written by the owner: how it all began, about ten years in the gecko world, and
+                what is sought in every generation.
+              </PendingContent>
+            )}
+          </div>
+          {settings.story.signature ? <p className="letter__sign">{settings.story.signature}</p> : null}
+        </article>
+      </section>
+    </>
   )
 }

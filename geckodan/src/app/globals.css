@@ -49,6 +49,7 @@
 
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   --header-h: 76px;
+  --radius-card: 28px;
 }
 
 *,
@@ -327,6 +328,31 @@ textarea {
   height: 12px;
   flex: none;
   transition: transform 160ms var(--ease-out);
+}
+
+/* Filled pill, as in the reference */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 1.4rem;
+  border-radius: 999px;
+  background: var(--rust);
+  color: #fff;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background-color 160ms ease, transform 160ms var(--ease-out);
+}
+
+.pill:active {
+  transform: scale(0.97);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .pill:hover {
+    background: var(--rust-deep);
+  }
 }
 
 .text-link {
@@ -730,22 +756,66 @@ textarea {
 /* ---------- Page heading (non-home pages) ---------- */
 
 .page-head {
-  padding-top: clamp(48px, 8vw, 112px);
-  padding-bottom: clamp(32px, 5vw, 64px);
+  margin-top: clamp(0.75rem, 2vw, 1.5rem);
+  padding-bottom: clamp(1.5rem, 3vw, 2.5rem);
+}
+
+/* A rounded highlight card: large title left, optional pill button right,
+   with the GeckoDan mark as a quiet backdrop until real photos are added. */
+.page-head__card {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem 2rem;
+  align-items: flex-start;
+  justify-content: space-between;
+  min-height: clamp(220px, 26vw, 340px);
+  padding: clamp(1.75rem, 4vw, 3.5rem);
+  overflow: hidden;
+  border-radius: calc(var(--radius-card) + 4px);
+  background: var(--paper-2);
+  isolation: isolate;
+}
+
+.page-head__card::after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  right: clamp(-2rem, -2vw, 0rem);
+  bottom: -12%;
+  width: min(42%, 340px);
+  aspect-ratio: 640 / 606;
+  background: url('/brand/geckodan-logo-640.png') no-repeat center / contain;
+  opacity: 0.1;
+}
+
+.page-head__text {
+  max-width: 44rem;
 }
 
 .page-head .headline {
-  font-size: clamp(2.5rem, 1.2rem + 5vw, 5.25rem);
+  font-size: clamp(2.5rem, 1.2rem + 4.6vw, 5rem);
   text-transform: uppercase;
 }
 
 .page-head .tagline {
-  margin-top: 16px;
+  margin-top: 14px;
   color: var(--ink-soft);
 }
 
 .page-head .lead {
-  margin-top: 24px;
+  margin-top: 20px;
+  max-width: 52ch;
+}
+
+.page-head__action {
+  align-self: flex-start;
+  gap: 10px;
+}
+
+.page-head__action .arrow {
+  width: 16px;
+  height: 10px;
 }
 
 /* ---------- Status ---------- */
@@ -803,6 +873,7 @@ textarea {
   display: block;
   aspect-ratio: 4 / 5;
   overflow: hidden;
+  border-radius: var(--radius-card);
   background: var(--paper-3);
 }
 
@@ -1245,6 +1316,7 @@ textarea {
   width: min(680px, 100% - 2 * var(--margin));
   margin-inline: auto;
   padding: clamp(32px, 6vw, 64px);
+  border-radius: var(--radius-card);
   background: var(--paper);
 }
 
@@ -1484,6 +1556,7 @@ textarea {
   aspect-ratio: 4 / 5;
   background: var(--paper-3);
   overflow: hidden;
+  border-radius: var(--radius-card);
 }
 
 .gallery__main img {
