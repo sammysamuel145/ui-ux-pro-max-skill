@@ -7,31 +7,34 @@
   <meta name="description" content="Rangcum Software Development membuat software untuk membantu bisnis berkembang. Produk unggulan: Relay CRM, fitur lengkap dengan harga terjangkau.">
   <meta name="theme-color" content="#ffffff">
   <meta name="color-scheme" content="light">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='380 294 440 306'%3E%3Crect x='386' y='307' width='52' height='281' fill='%232673b7'/%3E%3Cpath fill='%232f9db3' fill-rule='evenodd' d='M621 319A146 146 0 1 0 621 575L621 505A92 92 0 1 1 621 389Z'/%3E%3Cpath fill='%2332aeb1' d='M659 332Q659 313 674 300L801 414Q823 445 801 476L674 594Q659 582 659 563L659 538L752 446L659 357Z'/%3E%3C/svg%3E">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@500;600;700&family=Figtree:wght@400;500;600&family=Montserrat:wght@400&display=swap" rel="stylesheet">
 
   <style>
-    /* ---------- Token ---------- */
+    /* ---------- Token (warna diambil dari logo Rangcum) ---------- */
     :root {
-      --blue-950: #061b47;
-      --blue-900: #07245c;
-      --blue-700: #0a4fd1;
-      --blue-800: #083fa8;
-      --cyan-500: #06b6d4;
-      --cyan-300: #67e8f9;
-      --ink: #0d1a33;
-      --muted: #44546e;
+      --brand-blue: #2673b7;
+      --brand-blue-dark: #1d5d97;
+      --brand-teal: #32aeb1;
+      --teal-soft: #9fdde0;
+      --navy: #11294f;
+      --navy-deep: #0a2140;
+      --ink: #102a46;
+      --muted: #4a5d74;
+      --tagline: #707173;
       --bg: #ffffff;
-      --bg-soft: #f3f7fc;
-      --line: #d6e2f2;
+      --bg-soft: #f2f7f8;
+      --line: #d5e4ea;
 
       --radius: 12px;
       --gutter: max(20px, env(safe-area-inset-left), env(safe-area-inset-right));
       --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
 
-      --font-display: "Bricolage Grotesque", system-ui, -apple-system, "Segoe UI", sans-serif;
+      --font-display: "Lexend", system-ui, -apple-system, "Segoe UI", sans-serif;
+      --font-tagline: "Montserrat", system-ui, -apple-system, "Segoe UI", sans-serif;
       --font-body: "Figtree", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
     }
 
@@ -42,7 +45,7 @@
       scroll-padding-top: 88px;
       -webkit-text-size-adjust: 100%;
       -webkit-tap-highlight-color: transparent;
-      scrollbar-color: var(--blue-700) var(--bg-soft);
+      scrollbar-color: var(--brand-blue) var(--bg-soft);
     }
     body {
       margin: 0;
@@ -52,21 +55,22 @@
       color: var(--ink);
       background: var(--bg);
       -webkit-font-smoothing: antialiased;
-      caret-color: var(--blue-700);
+      caret-color: var(--brand-blue);
     }
-    h1, h2, h3, p, dl, dd, ul { margin: 0; padding: 0; }
-    h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; overflow-wrap: anywhere; }
+    h1, h2, h3, p, dl, dd { margin: 0; padding: 0; }
+    h1, h2, h3 {
+      font-family: var(--font-display);
+      text-wrap: balance;
+      overflow-wrap: anywhere;
+    }
     p { text-wrap: pretty; }
     a { color: inherit; }
-    ::selection { background: var(--cyan-300); color: var(--blue-950); }
+    ::selection { background: var(--teal-soft); color: var(--navy-deep); }
 
-    .wrap {
-      width: min(1120px, 100%);
-      margin-inline: auto;
-    }
+    .wrap { width: min(1120px, 100%); margin-inline: auto; }
 
     :focus-visible {
-      outline: 3px solid var(--blue-700);
+      outline: 3px solid var(--brand-blue);
       outline-offset: 3px;
       border-radius: 4px;
     }
@@ -75,13 +79,15 @@
       position: absolute;
       left: var(--gutter);
       top: -60px;
-      padding: 10px 16px;
-      background: var(--blue-900);
-      color: #fff;
-      border-radius: var(--radius);
       z-index: 20;
+      padding: 10px 16px;
+      border-radius: var(--radius);
+      background: var(--navy);
+      color: #fff;
     }
     .skip:focus { top: 10px; }
+
+    .mark { display: block; flex: none; }
 
     /* ---------- Tombol ---------- */
     .btn {
@@ -90,10 +96,9 @@
       justify-content: center;
       gap: 10px;
       min-height: 48px;
-      padding: 0 22px;
+      padding: 12px 22px;
       border: 2px solid transparent;
       border-radius: var(--radius);
-      padding-block: 12px;
       font: 600 1rem/1.2 var(--font-body);
       text-align: center;
       text-decoration: none;
@@ -105,17 +110,26 @@
       transition: transform 160ms var(--ease-out), background-color 160ms ease, color 160ms ease, border-color 160ms ease;
     }
     .btn:active { transform: scale(0.97); }
-    .btn-lg { min-height: 56px; padding: 0 30px; font-size: 1.0625rem; }
+    .btn-lg { min-height: 56px; padding: 14px 28px; font-size: 1.0625rem; }
 
-    .btn-primary { background: var(--blue-700); color: #fff; }
-    .btn-ghost { color: var(--blue-700); border-color: var(--blue-700); background: transparent; }
-    .btn-light { background: #fff; color: var(--blue-900); }
+    .btn-primary { background: var(--brand-blue); color: #fff; }
+    .btn-ghost { background: transparent; color: var(--brand-blue); border-color: var(--brand-blue); }
+    .btn-light { background: #fff; color: var(--navy); }
     .btn-light:focus-visible { outline-color: #fff; }
 
+    /* Panah kecil dari bentuk ">" pada logo */
+    .btn .chev {
+      width: 9px;
+      height: 14px;
+      flex: none;
+      transition: transform 160ms var(--ease-out);
+    }
+
     @media (hover: hover) and (pointer: fine) {
-      .btn-primary:hover { background: var(--blue-800); }
-      .btn-ghost:hover { background: var(--blue-700); color: #fff; }
-      .btn-light:hover { background: var(--cyan-300); }
+      .btn-primary:hover { background: var(--brand-blue-dark); }
+      .btn-ghost:hover { background: var(--brand-blue); color: #fff; }
+      .btn-light:hover { background: var(--teal-soft); }
+      .btn:hover .chev { transform: translateX(3px); }
     }
 
     /* ---------- Header ---------- */
@@ -129,63 +143,69 @@
     }
     .site-header .wrap {
       display: flex;
+      flex-wrap: wrap;
       align-items: center;
       justify-content: space-between;
-      flex-wrap: wrap;
       gap: 8px 16px;
       min-height: 68px;
       padding-block: 8px;
     }
-    .wordmark {
-      font-family: var(--font-display);
-      font-weight: 800;
-      font-size: 1.5rem;
-      letter-spacing: -0.03em;
-      color: var(--blue-900);
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
       text-decoration: none;
     }
-    .site-header .btn { min-height: 44px; padding: 0 18px; font-size: 0.9375rem; }
+    .brand .mark { width: 50px; height: 35px; }
+    .brand-text { display: grid; justify-items: start; line-height: 1; }
+    .brand-name {
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 1.875rem;
+      letter-spacing: -0.01em;
+      color: var(--navy);
+    }
+    .brand-tag {
+      margin-top: 5px;
+      font-family: var(--font-tagline);
+      font-weight: 400;
+      font-size: 8.25px;
+      letter-spacing: 0.1em;
+      margin-right: -0.1em;
+      color: var(--tagline);
+      white-space: nowrap;
+    }
+    .site-header .btn { min-height: 44px; padding: 10px 18px; font-size: 0.9375rem; }
 
     /* ---------- Hero ---------- */
     .hero {
       position: relative;
       overflow: hidden;
-      padding: clamp(64px, 11vw, 136px) var(--gutter) clamp(72px, 12vw, 148px);
+      padding: clamp(56px, 9vw, 112px) var(--gutter) clamp(72px, 11vw, 136px);
       background: var(--bg);
     }
-    /* Motif geometris: cincin tipis cyan dari pojok kanan atas */
-    .hero::before {
-      content: "";
-      position: absolute;
-      top: -320px;
-      right: -320px;
-      width: 880px;
-      height: 880px;
-      border-radius: 50%;
-      background:
-        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 880 880' fill='none' stroke='%2306b6d4' stroke-opacity='.4' stroke-width='1.5'%3E%3Ccircle cx='440' cy='440' r='96'/%3E%3Ccircle cx='440' cy='440' r='150'/%3E%3Ccircle cx='440' cy='440' r='204'/%3E%3Ccircle cx='440' cy='440' r='258'/%3E%3Ccircle cx='440' cy='440' r='312'/%3E%3Ccircle cx='440' cy='440' r='366'/%3E%3Ccircle cx='440' cy='440' r='420'/%3E%3C/svg%3E") center / 100% 100% no-repeat,
-        radial-gradient(circle at center, rgba(10, 79, 209, 0.07), transparent 62%);
-      -webkit-mask-image: radial-gradient(circle at center, #000 18%, transparent 68%);
-      mask-image: radial-gradient(circle at center, #000 18%, transparent 68%);
-      pointer-events: none;
+    .hero .wrap {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      column-gap: 48px;
+      align-items: end;
     }
-    .hero .wrap { position: relative; }
     .hero h1 {
       max-width: 24ch;
-      font-size: clamp(2.375rem, 5.4vw, 4.25rem);
+      font-size: clamp(2.125rem, 5.6vw, 4.25rem);
       line-height: 1.04;
-      font-weight: 800;
+      font-weight: 700;
       letter-spacing: -0.035em;
-      color: var(--blue-900);
+      color: var(--navy);
     }
     .hero h1 em {
       font-style: normal;
-      color: var(--blue-700);
+      color: var(--brand-blue);
     }
     .hero p {
-      max-width: 34em;
+      max-width: 32em;
       margin-top: 24px;
-      font-size: clamp(1.0625rem, 2.1vw, 1.25rem);
+      font-size: clamp(1.0625rem, 2vw, 1.25rem);
       color: var(--muted);
     }
     .hero-actions {
@@ -194,9 +214,18 @@
       gap: 12px;
       margin-top: 36px;
     }
+    .hero-mark {
+      display: none;
+      position: relative;
+      justify-self: end;
+      width: min(100%, 340px);
+    }
+    .hero-mark .mark { width: 100%; height: auto; }
 
     /* ---------- Relay CRM ---------- */
     .product {
+      position: relative;
+      overflow: hidden;
       padding: clamp(72px, 10vw, 128px) var(--gutter);
       background: var(--bg-soft);
     }
@@ -208,23 +237,22 @@
     .product h2 {
       font-size: clamp(2.25rem, 5vw, 3.75rem);
       line-height: 1.04;
-      font-weight: 800;
+      font-weight: 700;
       letter-spacing: -0.035em;
-      color: var(--blue-900);
+      color: var(--navy);
     }
     .selling {
-      margin-top: 24px;
       max-width: 30em;
+      margin-top: 24px;
       font-size: clamp(1.1875rem, 2.2vw, 1.4375rem);
       line-height: 1.5;
       font-weight: 500;
-      color: var(--ink);
     }
     .selling strong {
       font-weight: 600;
-      color: var(--blue-700);
+      color: var(--brand-blue);
       text-decoration: underline;
-      text-decoration-color: var(--cyan-500);
+      text-decoration-color: var(--brand-teal);
       text-decoration-thickness: 3px;
       text-underline-offset: 5px;
     }
@@ -233,51 +261,76 @@
     .features { border-bottom: 1px solid var(--line); }
     .features div {
       display: grid;
-      gap: 4px;
+      grid-template-columns: 14px minmax(0, 1fr);
+      column-gap: 16px;
+      row-gap: 4px;
       padding: 22px 0;
       border-top: 1px solid var(--line);
+    }
+    /* Penanda baris: ">" kecil dari logo */
+    .features div::before {
+      content: "";
+      grid-row: 1 / span 2;
+      width: 10px;
+      height: 14px;
+      margin-top: 8px;
+      background: var(--brand-teal);
+      clip-path: polygon(0 0, 35% 0, 100% 50%, 35% 100%, 0 100%, 65% 50%);
     }
     .features dt {
       font-family: var(--font-display);
       font-size: 1.25rem;
       font-weight: 700;
       letter-spacing: -0.015em;
-      color: var(--blue-900);
+      color: var(--navy);
     }
-    .features dd {
-      max-width: 36em;
-      color: var(--muted);
-    }
+    .features dd { max-width: 36em; color: var(--muted); }
     .assurance {
-      margin-top: 28px;
       max-width: 36em;
+      margin-top: 28px;
       font-weight: 500;
-      color: var(--ink);
     }
 
     /* ---------- CTA ---------- */
     .cta {
+      position: relative;
+      overflow: hidden;
       padding: clamp(72px, 10vw, 120px) var(--gutter);
-      background: var(--blue-900);
+      background: var(--navy);
       color: #fff;
     }
+    /* Motif ">" besar dari logo, tembus pandang di kanan */
+    .cta::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      right: -40px;
+      width: 360px;
+      height: 520px;
+      translate: 0 -50%;
+      background: linear-gradient(180deg, var(--brand-teal), var(--brand-blue));
+      clip-path: polygon(0 4%, 12% 0, 100% 46%, 100% 54%, 12% 100%, 0 96%, 0 88%, 64% 50%, 0 12%);
+      opacity: 0.35;
+      pointer-events: none;
+    }
+    .cta .wrap { position: relative; z-index: 1; }
     .cta h2 {
-      max-width: 18ch;
+      max-width: 16ch;
       font-size: clamp(2rem, 4.8vw, 3.5rem);
       line-height: 1.06;
-      font-weight: 800;
+      font-weight: 700;
       letter-spacing: -0.03em;
     }
     .cta p {
       max-width: 30em;
       margin-top: 18px;
       font-size: 1.1875rem;
-      color: #cfe0ff;
+      color: #cfe2f2;
     }
     .cta .btn { margin-top: 36px; }
-    .cta ::selection { background: var(--cyan-500); color: var(--blue-950); }
+    .cta ::selection { background: var(--brand-teal); color: var(--navy-deep); }
 
-    .wa-icon { width: 22px; height: 22px; flex: none; fill: currentColor; }
+    .wa-icon { width: 22px; height: 22px; flex: none; fill: #1fa855; }
 
     /* ---------- Footer ---------- */
     .site-footer {
@@ -285,11 +338,20 @@
       font-size: 0.9375rem;
       color: var(--muted);
       background: var(--bg);
-      border-top: 1px solid var(--line);
     }
+    .site-footer .wrap {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px 16px;
+    }
+    .site-footer .wrap { justify-content: space-between; }
 
     /* ---------- Layar lebar ---------- */
     @media (min-width: 900px) {
+      .hero .wrap { grid-template-columns: minmax(0, 1fr) auto; }
+      .hero h1 { grid-column: 1 / -1; }
+      .hero-mark { display: block; }
       .product-grid {
         grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
         gap: 96px;
@@ -298,49 +360,86 @@
       .product-intro { position: sticky; top: 112px; }
     }
 
-    /* ---------- HP kecil ---------- */
+    /* ---------- HP ---------- */
     @media (max-width: 520px) {
-      .hero::before { top: -230px; right: -300px; width: 560px; height: 560px; opacity: 0.55; }
-      .hero-actions .btn { width: 100%; }
-      .product .btn, .cta .btn { width: 100%; }
+      .hero-actions .btn, .product .btn, .cta .btn { width: 100%; }
       .site-header .wrap { min-height: 60px; }
+      .cta::after { right: -150px; opacity: 0.25; }
     }
-
     @media (max-width: 380px) {
-      .site-header .wrap { gap: 10px; }
-      .wordmark { font-size: 1.25rem; }
-      .site-header .btn { padding: 0 12px; font-size: 0.875rem; }
+      .brand-name { font-size: 1.5rem; }
+      .hide-xs { display: none; }
+      .brand-tag { display: none; }
+      .brand .mark { width: 36px; height: 25px; }
+      .site-header .btn { padding: 10px 12px; font-size: 0.875rem; }
     }
 
-    /* ---------- Gerak: satu momen, hero muncul bertahap ---------- */
+    /* ---------- Gerak: satu momen, logo "melaju" saat halaman dibuka ---------- */
     @media (prefers-reduced-motion: no-preference) {
       @keyframes rise {
         from { opacity: 0; transform: translateY(14px); }
       }
-      @keyframes ring-in {
-        from { opacity: 0; transform: scale(0.94); }
+      @keyframes relay {
+        from { opacity: 0; transform: translateX(-56px); }
       }
-      .hero h1, .hero p, .hero-actions {
-        animation: rise 700ms var(--ease-out) both;
+      @keyframes settle {
+        from { opacity: 0; transform: scale(0.96); }
       }
-      .hero p { animation-delay: 90ms; }
-      .hero-actions { animation-delay: 180ms; }
-      .hero::before { animation: ring-in 1100ms var(--ease-out) both; }
+      .hero h1, .hero p, .hero-actions { animation: rise 700ms var(--ease-out) both; }
+      .hero p { animation-delay: 80ms; }
+      .hero-actions { animation-delay: 160ms; }
+      .hero-mark .rc { animation: settle 800ms var(--ease-out) 120ms both; transform-box: fill-box; transform-origin: center; }
+      .hero-mark .chevron { animation: relay 900ms var(--ease-out) 320ms both; transform-box: fill-box; }
     }
     @media (prefers-reduced-motion: reduce) {
       html { scroll-behavior: auto; }
-      .btn { transition: none; }
+      .btn, .btn .chev { transition: none; }
     }
   </style>
 </head>
 
 <body>
+  <!-- Logo Rangcum sebagai simbol SVG, dipakai ulang di header dan footer -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <defs>
+      <linearGradient id="rc-ring" x1="455" y1="400" x2="615" y2="330" gradientUnits="userSpaceOnUse">
+        <stop offset="0" stop-color="#2779b7"/>
+        <stop offset="1" stop-color="#32aeb1"/>
+      </linearGradient>
+      <linearGradient id="rc-chev" x1="700" y1="330" x2="680" y2="590" gradientUnits="userSpaceOnUse">
+        <stop offset="0" stop-color="#32aeb1"/>
+        <stop offset="0.45" stop-color="#2b9bb3"/>
+        <stop offset="1" stop-color="#2372b5"/>
+      </linearGradient>
+      <clipPath id="rc-open"><rect x="380" y="290" width="241" height="320"/></clipPath>
+      <clipPath id="rc-low"><path d="M380 470L434 470A128 128 0 0 1 468 382L551 447L640 447L640 610L380 610Z"/></clipPath>
+      <path id="rc-ring-shape" fill-rule="evenodd" d="M551 301a146 146 0 1 0 0.01 0zM551 355a92 92 0 1 1 -0.01 0z"/>
+      <symbol id="rc-logo" viewBox="380 294 440 306">
+        <g clip-path="url(#rc-open)">
+          <use href="#rc-ring-shape" fill="url(#rc-ring)"/>
+          <use href="#rc-ring-shape" fill="#32aeb1" clip-path="url(#rc-low)"/>
+        </g>
+        <rect x="386" y="307" width="52" height="281" fill="#2673b7"/>
+        <path fill="url(#rc-chev)" d="M659 332Q659 313 674 300L801 414Q823 445 801 476L674 594Q659 582 659 563L659 538L752 446L659 357Z"/>
+      </symbol>
+      <symbol id="chev" viewBox="0 0 9 14">
+        <path d="M1.5 1.5L7 7l-5.5 5.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+      </symbol>
+    </defs>
+  </svg>
+
   <a class="skip" href="#relay-crm">Lewati ke produk</a>
 
   <header class="site-header">
     <div class="wrap">
-      <a class="wordmark" href="#" aria-label="Rangcum, kembali ke atas">Rangcum</a>
-      <a class="btn btn-primary" href="https://wa.me/6285740218129" target="_blank" rel="noopener noreferrer">Konsultasi Sekarang</a>
+      <a class="brand" href="#" aria-label="Rangcum, kembali ke atas">
+        <svg class="mark" aria-hidden="true"><use href="#rc-logo"/></svg>
+        <span class="brand-text">
+          <span class="brand-name">rangcum</span>
+          <span class="brand-tag">SOFTWARE DEVELOPMENT</span>
+        </span>
+      </a>
+      <a class="btn btn-primary" href="https://wa.me/6285740218129" target="_blank" rel="noopener noreferrer">Konsultasi<span class="hide-xs"> Sekarang</span></a>
     </div>
   </header>
 
@@ -348,10 +447,27 @@
     <section class="hero">
       <div class="wrap">
         <h1>Solusi Software Development <em>Simpel &amp; Tepat Sasaran.</em></h1>
-        <p>Kami membuat software yang membantu bisnis Anda berkembang: mudah dipakai, sesuai kebutuhan, dan terjangkau.</p>
-        <div class="hero-actions">
-          <a class="btn btn-primary btn-lg" href="https://wa.me/6285740218129" target="_blank" rel="noopener noreferrer">Konsultasi Sekarang</a>
-          <a class="btn btn-ghost btn-lg" href="#relay-crm">Lihat Relay CRM</a>
+        <div class="copy">
+          <p>Kami membuat software yang membantu bisnis Anda berkembang: mudah dipakai, sesuai kebutuhan, dan terjangkau.</p>
+          <div class="hero-actions">
+            <a class="btn btn-primary btn-lg" href="https://wa.me/6285740218129" target="_blank" rel="noopener noreferrer">
+              Konsultasi Sekarang
+              <svg class="chev" aria-hidden="true"><use href="#chev"/></svg>
+            </a>
+            <a class="btn btn-ghost btn-lg" href="#relay-crm">Lihat Relay CRM</a>
+          </div>
+        </div>
+        <div class="hero-mark" aria-hidden="true">
+          <svg class="mark" viewBox="380 294 440 306">
+            <g class="rc">
+              <g clip-path="url(#rc-open)">
+                <use href="#rc-ring-shape" fill="url(#rc-ring)"/>
+                <use href="#rc-ring-shape" fill="#32aeb1" clip-path="url(#rc-low)"/>
+              </g>
+              <rect x="386" y="307" width="52" height="281" fill="#2673b7"/>
+            </g>
+            <path class="chevron" fill="url(#rc-chev)" d="M659 332Q659 313 674 300L801 414Q823 445 801 476L674 594Q659 582 659 563L659 538L752 446L659 357Z"/>
+          </svg>
         </div>
       </div>
     </section>
@@ -361,7 +477,10 @@
         <div class="product-intro">
           <h2>Relay CRM</h2>
           <p class="selling">Relay CRM menawarkan fitur manajemen hubungan pelanggan yang lengkap dengan harga yang <strong>jauh lebih murah dan terjangkau</strong> dibandingkan aplikasi CRM lain di pasaran.</p>
-          <a class="btn btn-primary btn-lg" href="https://wa.me/6285740218129" target="_blank" rel="noopener noreferrer">Pesan Relay CRM</a>
+          <a class="btn btn-primary btn-lg" href="https://wa.me/6285740218129" target="_blank" rel="noopener noreferrer">
+            Pesan Relay CRM
+            <svg class="chev" aria-hidden="true"><use href="#chev"/></svg>
+          </a>
           <!-- Tempat screenshot produk: letakkan gambar asli Relay CRM di sini (sekitar 1600x1000). -->
         </div>
 
@@ -407,7 +526,16 @@
   </main>
 
   <footer class="site-footer">
-    <div class="wrap">&copy; 2026 Rangcum Software Development. All rights reserved.</div>
+    <div class="wrap">
+      <span class="brand" aria-hidden="true">
+        <svg class="mark"><use href="#rc-logo"/></svg>
+        <span class="brand-text">
+          <span class="brand-name">rangcum</span>
+          <span class="brand-tag">SOFTWARE DEVELOPMENT</span>
+        </span>
+      </span>
+      <span>&copy; 2026 Rangcum Software Development. All rights reserved.</span>
+    </div>
   </footer>
 </body>
 </html>

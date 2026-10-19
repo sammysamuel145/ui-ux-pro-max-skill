@@ -1,0 +1,300 @@
+// End-to-end test of the admin and public flows against a LOCAL Supabase stack
+// and a running app (`npm run build && npm start`). It creates throwaway users
+// and an obviously named test gecko, drives the real UI in Chromium, and
+// removes everything it created at the end.
+//
+//   BASE_URL=http://localhost:3000 npm run test:e2e
+//
+// Playwright is loaded from PLAYWRIGHT_MODULE when set (for a shared install),
+// otherwise from the `playwright` package.
+
+import { execFileSync } from 'node:child_process'
+import { createClient } from '@supabase/supabase-js'
+
+const BASE = process.env.BASE_URL ?? 'http://localhost:3000'
+const { chromium } = await import(process.env.PLAYWRIGHT_MODULE ?? 'playwright')
+
+function localEnv() {
+  const out = execFileSync('npx', ['supabase', 'status', '-o', 'env'], { encoding: 'utf8' })
+  const env = Object.fromEntries(
+    out
+      .split('\n')
+      .map((l) => l.match(/^([A-Z_]+)="?(.*?)"?$/))
+      .filter(Boolean)
+      .map((m) => [m[1], m[2]]),
+  )
+  if (!/^http:\/\/(127\.0\.0\.1|localhost)/.test(env.API_URL ?? '')) {
+    throw new Error('Refusing to run: this test only runs against a local Supabase stack.')
+  }
+  return env
+}
+
+const env = localEnv()
+const service = createClient(env.API_URL, env.SERVICE_ROLE_KEY, { auth: { persistSession: false } })
+
+let passes = 0
+let failures = 0
+function check(name, ok, detail = '') {
+  if (ok) {
+    passes++
+    console.log(`  ok   ${name}`)
+  } else {
+    failures++
+    console.log(`  FAIL ${name}${detail ? `: ${detail}` : ''}`)
+  }
+}
+
+const stamp = Date.now()
+const password = `E2e-${stamp}-pw!`
+const adminEmail = `e2e-admin-${stamp}@test.local`
+const userEmail = `e2e-user-${stamp}@test.local`
+const code = `E2E-${String(stamp).slice(-6)}`
+const name = `E2E Test Gecko ${String(stamp).slice(-6)}`
+const users = []
+
+// A 2x2 PNG, built in memory so the test needs no fixture file.
+const png = Buffer.from(
+  'iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAIAAAD91JpzAAAAFklEQVR4nGP8z8DAwMDAxMDAwMDAAAANHQEDasKb6QAAAABJRU5ErkJggg==',
+  'base64',
+)
+
+const browser = await chromium.launch(
+  process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {},
+)
+
+async function login(page, email) {
+  await page.goto(`${BASE}/admin`)
+  await page.getByLabel('Email').fill(email)
+  await page.getByLabel('Kata sandi').fill(password)
+  await page.getByRole('button', { name: 'Masuk' }).click()
+}
+
+try {
+  for (const email of [adminEmail, userEmail]) {
+    const { data, error } = await service.auth.admin.createUser({ email, password, email_confirm: true })
+    if (error) throw error
+    users.push(data.user.id)
+  }
+  {
+    const { error } = await service.from('admin_users').insert({ user_id: users[0] })
+    if (error) throw error
+  }
+
+  console.log('Access control')
+  {
+    const context = await browser.newContext()
+    const page = await context.newPage()
+    await page.goto(`${BASE}/admin/dashboard/geckos`)
+    check('a visitor is sent to the login page', page.url().startsWith(`${BASE}/admin?reason=signin`), page.url())
+
+    await login(page, userEmail)
+    await page.getByText('akun tidak memiliki akses admin').waitFor({ timeout: 10000 })
+    check('a signed-in non-admin is refused', true)
+    await page.goto(`${BASE}/admin/dashboard`)
+    check('a non-admin cannot open the dashboard', page.url().startsWith(`${BASE}/admin?reason=signin`), page.url())
+
+    await login(page, 'nobody@test.local')
+    await page.getByText('Email atau kata sandi salah').waitFor({ timeout: 10000 })
+    check('a wrong login shows a generic error', true)
+    await context.close()
+  }
+
+  console.log('Admin flow')
+  const context = await browser.newContext()
+  const page = await context.newPage()
+  const consoleErrors = []
+  page.on('console', (m) => m.type() === 'error' && consoleErrors.push(m.text()))
+
+  await login(page, adminEmail)
+  await page.waitForURL(`${BASE}/admin/dashboard`)
+  check('the admin reaches the dashboard', true)
+
+  await page.goto(`${BASE}/admin/dashboard/geckos/new`)
+  await page.getByLabel('Nama', { exact: true }).fill(name)
+  await page.getByLabel('ID gecko').fill('bad id!')
+  await page.getByLabel('ID gecko').evaluate((el) => el.removeAttribute('pattern'))
+  await page.getByRole('button', { name: 'Buat gecko' }).click()
+  await page.getByText('ID hanya huruf').waitFor({ timeout: 10000 })
+  check('server-side validation rejects an invalid ID', (await page.getByLabel('Nama', { exact: true }).inputValue()) === name)
+
+  await page.getByLabel('ID gecko').fill(code)
+  await page.getByLabel('Morph').fill('Test morph')
+  await page.getByLabel('Status penjualan').selectOption('available')
+  await page.getByRole('button', { name: 'Buat gecko' }).click()
+  await page.waitForURL(/\/admin\/dashboard\/geckos\/[0-9a-f-]{36}\?created=1/)
+  const geckoId = page.url().match(/geckos\/([0-9a-f-]{36})/)[1]
+  check('the admin creates a gecko', Boolean(geckoId))
+
+  const { data: draft } = await service.from('geckos').select('slug, published').eq('id', geckoId).single()
+  const anonCheck = await fetch(`${BASE}/geckos/${draft.slug}`)
+  check('a draft gecko is not public', anonCheck.status === 404, `HTTP ${anonCheck.status}`)
+
+  const photosInput = page.locator('section[aria-labelledby="photos-title"] input[type=file]')
+  await photosInput.setInputFiles({ name: 'test.png', mimeType: 'image/png', buffer: png })
+  await page.getByRole('button', { name: 'Upload' }).click()
+  await page.getByText('1 file tersimpan.').waitFor({ timeout: 15000 })
+  await page.locator('.photo-card img').first().waitFor({ timeout: 10000 })
+  check('the admin uploads a photo and it becomes the cover', (await page.locator('.photo-card .tag', { hasText: 'Sampul' }).count()) === 1)
+
+  await photosInput.setInputFiles({ name: 'fake.png', mimeType: 'image/png', buffer: Buffer.from('<svg/>') })
+  await page.getByRole('button', { name: 'Upload' }).click()
+  await page.getByText('bukan gambar').waitFor({ timeout: 15000 })
+  check('a fake image is rejected', true)
+
+  // A real photo well above the old 8 MB limit goes straight to Storage and is recorded.
+  const sharp = (await import('sharp')).default
+  const bigPng = await sharp({ create: { width: 2400, height: 2400, channels: 3, noise: { type: 'gaussian', mean: 128, sigma: 60 } } }).png({ compressionLevel: 1 }).toBuffer()
+  check('the test photo is bigger than the old 8 MB limit', bigPng.length > 9 * 1024 * 1024, `${(bigPng.length / 1048576).toFixed(1)} MB`)
+  await photosInput.setInputFiles({ name: 'big.png', mimeType: 'image/png', buffer: bigPng })
+  await page.getByRole('button', { name: 'Upload' }).click()
+  await page.getByText('1 file tersimpan.').waitFor({ timeout: 60000 })
+  const stored = await service.storage.from('media').list(`geckos/${geckoId}`)
+  const sizes = (stored.data ?? []).map((o) => o.metadata?.size ?? 0)
+  check('a photo over 8 MB is stored with its full size', sizes.some((n) => n === bigPng.length), sizes.join(', '))
+  check('the large photo is listed in the dashboard', (await page.locator('.photo-card').count()) === 2)
+
+  // Over the 25 MB limit: refused in the browser before anything is uploaded.
+  await photosInput.setInputFiles({ name: 'huge.png', mimeType: 'image/png', buffer: Buffer.concat([png, Buffer.alloc(26 * 1024 * 1024)]) })
+  await page.getByRole('button', { name: 'Upload' }).click()
+  await page.getByText('lebih dari 25 MB').waitFor({ timeout: 15000 })
+  check('a file over 25 MB is refused', ((await service.storage.from('media').list(`geckos/${geckoId}`)).data ?? []).length === stored.data.length)
+
+  // A file that passes the browser check but is swapped for non-image bytes on the way to Storage:
+  // the server must notice, refuse it, and delete it.
+  await page.route('**/storage/v1/object/media/**', (route) => {
+    const body = route.request().postDataBuffer()
+    const at = body ? body.indexOf(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a])) : -1
+    if (!body || at < 0) return route.continue()
+    const tampered = Buffer.from(body)
+    Buffer.from('<svg    ').copy(tampered, at)
+    return route.continue({ postData: tampered })
+  })
+  await photosInput.setInputFiles({ name: 'tampered.png', mimeType: 'image/png', buffer: png })
+  await page.getByRole('button', { name: 'Upload' }).click()
+  await page.getByText('Isi file bukan gambar').waitFor({ timeout: 20000 })
+  await page.unroute('**/storage/v1/object/media/**')
+  const after = (await service.storage.from('media').list(`geckos/${geckoId}`)).data ?? []
+  check('a file swapped for non-image bytes is refused by the server', true)
+  check('and it is deleted from Storage, not left behind', after.length === stored.data.length, `${after.length} objects, expected ${stored.data.length}`)
+  check('the tampered file was never recorded for the gecko', (await service.from('gecko_photos').select('id').eq('gecko_id', geckoId)).data.length === 2)
+
+  await page.getByLabel('Publikasikan di situs').check()
+  await page.getByLabel('Tampilkan di beranda (unggulan)').check()
+  await page.getByRole('button', { name: 'Simpan perubahan' }).click()
+  await page.getByText('Perubahan disimpan.').waitFor({ timeout: 10000 })
+  check('the admin publishes the gecko', true)
+
+  console.log('Public site')
+  const visitor = await (await browser.newContext()).newPage()
+  await visitor.goto(`${BASE}/geckos/${draft.slug}`)
+  check('the published gecko page loads', (await visitor.getByRole('heading', { level: 1 }).textContent())?.includes(name))
+  const photo = visitor.locator('main img[src*="storage"], main img[src*="_next/image"]').first()
+  check('the gecko photo is shown', (await photo.count()) === 1)
+  const wa = await visitor.getByRole('main').getByRole('link', { name: 'Ask on WhatsApp' }).getAttribute('href')
+  const message = decodeURIComponent(new URL(wa).searchParams.get('text') ?? '')
+  check('the WhatsApp link goes to the GeckoDan number', wa.startsWith('https://wa.me/6285174413278'))
+  check(
+    'the WhatsApp message names the gecko, ID and page',
+    message.includes(name) && message.includes(code) && message.includes(`/geckos/${draft.slug}`),
+    message,
+  )
+  const html = await visitor.content()
+  check('no price is shown', !/Rp\s?\d|harga:\s*\d/i.test(html))
+
+  await visitor.goto(`${BASE}/geckos?q=${encodeURIComponent(code)}`)
+  check('the catalog search finds the gecko', (await visitor.getByText(name).count()) > 0)
+
+  await page.getByRole('button', { name: 'Arsipkan' }).click()
+  await page.getByText('Gecko diarsipkan').waitFor({ timeout: 10000 })
+  const archived = await fetch(`${BASE}/geckos/${draft.slug}`)
+  check('an archived gecko disappears from the site', archived.status === 404, `HTTP ${archived.status}`)
+
+  page.once('dialog', (d) => d.accept())
+  await page.getByRole('button', { name: 'Hapus permanen' }).click()
+  await page.waitForURL(`${BASE}/admin/dashboard/geckos?deleted=1`)
+  const { data: gone } = await service.from('geckos').select('id').eq('id', geckoId)
+  const { data: objects } = await service.storage.from('media').list(`geckos/${geckoId}`)
+  check('deleting a gecko removes its record and photos', gone.length === 0 && (objects ?? []).length === 0)
+
+  console.log('Site-wide pictures')
+  await page.goto(`${BASE}/admin/dashboard/settings`)
+  const sec = (id) => page.locator(`section[aria-labelledby="${id}"]`)
+  const homeImgs = async (sel) => {
+    const v = await ctx2.newPage()
+    await v.goto(`${BASE}/`)
+    await v.locator(sel).first().scrollIntoViewIfNeeded().catch(() => undefined)
+    await v.waitForFunction((q) => [...document.querySelectorAll(q)].every((e) => e.complete), sel, { timeout: 20000 }).catch(() => undefined)
+    const info = await v.locator(sel).evaluateAll((els) => els.map((e) => ({ src: e.currentSrc || e.src, ok: e.complete && e.naturalWidth > 0, alt: e.alt })))
+    const caption = await v.locator('.hero__caption').count()
+    const og = await v.locator('meta[property="og:image"]').first().getAttribute('content')
+    await v.close()
+    return { info, caption, og }
+  }
+  const ctx2 = await browser.newContext()
+
+  await sec('story-image-title').locator('input[type=text]').fill('Test breeder photo')
+  await sec('story-image-title').locator('input[type=file]').setInputFiles({ name: 'story.png', mimeType: 'image/png', buffer: png })
+  await sec('story-image-title').getByRole('button', { name: 'Upload' }).click()
+  await sec('story-image-title').getByText('1 file tersimpan.').waitFor({ timeout: 60000 })
+  let h = await homeImgs('.story__photo img')
+  check('the Our Story photo appears on the home page', h.info.length === 1 && /storage/.test(decodeURIComponent(h.info[0].src)) && h.info[0].ok && h.info[0].alt === 'Test breeder photo', JSON.stringify(h.info.map((i) => ({ ok: i.ok, alt: i.alt }))))
+  const v2 = await ctx2.newPage()
+  await v2.goto(`${BASE}/our-story`)
+  check('and on the Our Story page', (await v2.locator('.letter__photo img').count()) === 1)
+  await v2.close()
+
+  await sec('og-image-title').locator('input[type=file]').setInputFiles({ name: 'share.png', mimeType: 'image/png', buffer: png })
+  await sec('og-image-title').getByRole('button', { name: 'Upload' }).click()
+  await sec('og-image-title').getByText('1 file tersimpan.').waitFor({ timeout: 30000 })
+  h = await homeImgs('.hero img')
+  check('the share image is used for link previews (og:image)', /storage\/v1\/object\/public\/media\/site\/og\//.test(h.og ?? ''), h.og)
+
+  await sec('hero-image-title').locator('input[type=text]').fill('Test hero photo')
+  await sec('hero-image-title').locator('input[type=file]').setInputFiles({ name: 'hero.png', mimeType: 'image/png', buffer: png })
+  await sec('hero-image-title').getByRole('button', { name: 'Upload' }).click()
+  await sec('hero-image-title').getByText('1 file tersimpan.').waitFor({ timeout: 30000 })
+  h = await homeImgs('.hero__media img')
+  check('an uploaded hero photo replaces the concept image and drops its caption', h.info.length === 1 && /storage/.test(decodeURIComponent(h.info[0].src)) && h.caption === 0, `caption=${h.caption}`)
+
+  // Removing each one restores the placeholder, and the old files are deleted.
+  page.on('dialog', (d) => d.accept())
+  await sec('hero-image-title').getByRole('button', { name: 'Kembali ke ilustrasi konsep' }).click()
+  await sec('hero-image-title').locator('.photo-card').waitFor({ state: 'detached', timeout: 15000 })
+  await sec('story-image-title').getByRole('button', { name: 'Hapus foto' }).click()
+  await sec('story-image-title').locator('.photo-card').waitFor({ state: 'detached', timeout: 15000 })
+  await sec('og-image-title').getByRole('button', { name: 'Hapus gambar' }).click()
+  await sec('og-image-title').locator('.photo-card').waitFor({ state: 'detached', timeout: 15000 })
+  h = await homeImgs('.story__photo img')
+  check('after removal the story photo, hero caption and og:image return to their defaults', h.info.every((i) => !/site\/story/.test(decodeURIComponent(i.src))) && h.caption === 1 && /geckodan-logo/.test(decodeURIComponent(h.og ?? '')), JSON.stringify({ srcs: h.info.map((i) => i.src), caption: h.caption, og: h.og }))
+  const left = []
+  for (const folder of ['site/hero', 'site/story', 'site/og']) left.push(...((await service.storage.from('media').list(folder)).data ?? []).filter((o) => o.name !== '.emptyFolderPlaceholder'))
+  check('the removed site pictures are deleted from Storage', left.length === 0, left.map((o) => o.name).join(','))
+  await ctx2.close()
+
+  await page.getByRole('button', { name: 'Keluar' }).click()
+  await page.waitForURL(/\/admin\?reason=signedout/)
+  await page.goto(`${BASE}/admin/dashboard`)
+  check('after signing out the dashboard is closed', page.url().startsWith(`${BASE}/admin?reason=signin`))
+
+  check('no console errors in the admin', consoleErrors.length === 0, consoleErrors.join(' | '))
+  await context.close()
+} catch (err) {
+  failures++
+  console.error('Unexpected error:', err)
+  for (const p of browser.contexts().flatMap((c) => c.pages())) {
+    const flashes = await p.locator('.flash').allTextContents().catch(() => [])
+    if (flashes.length) console.error('Page messages:', flashes.join(' | '))
+  }
+} finally {
+  const { data: leftovers } = await service.from('geckos').select('id').like('code', 'E2E-%')
+  for (const g of leftovers ?? []) {
+    const { data: objects } = await service.storage.from('media').list(`geckos/${g.id}`)
+    if (objects?.length) await service.storage.from('media').remove(objects.map((o) => `geckos/${g.id}/${o.name}`))
+    await service.from('geckos').delete().eq('id', g.id)
+  }
+  for (const id of users) await service.auth.admin.deleteUser(id)
+  await browser.close()
+}
+
+console.log(`\n${passes} passed, ${failures} failed`)
+process.exit(failures ? 1 : 0)
