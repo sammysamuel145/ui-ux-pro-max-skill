@@ -393,11 +393,17 @@ textarea {
   color: var(--ink);
 }
 
-.site-header.is-overlay {
+/* The home page has the full-bleed hero: the header floats over it. Chosen by CSS, not by
+   script, so the server-rendered page already looks right and nothing flips after hydration. */
+body:has(.hero) .site-header {
   position: absolute;
   inset: 0 0 auto;
   background: transparent;
   color: var(--on-night);
+}
+
+body:has(.hero) .site-header :focus-visible {
+  outline-color: var(--orange);
 }
 
 .site-header__bar {

@@ -20,7 +20,7 @@ export function ContextWhatsAppLink({
   children: ReactNode
   'aria-label'?: string
 }) {
-  const pathname = usePathname() ?? '/'
+  const pathname = usePathname() || '/'
   return (
     <a
       className={className}
