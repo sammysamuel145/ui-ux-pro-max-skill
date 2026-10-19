@@ -194,7 +194,7 @@ The website should support:
 - WhatsApp inquiries with prefilled messages.
 - SEO-friendly public pages.
 
-Public prices must remain hidden unless the owner explicitly changes this requirement.
+Public prices are shown only when the owner enters a price for a gecko, and not for sold geckos (the owner approved showing prices in October 2026). Do not show a price the owner has not entered.
 
 ### Business Information
 

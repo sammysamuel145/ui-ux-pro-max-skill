@@ -7,7 +7,7 @@ an owner-only admin dashboard.
 
 - Next.js 16 (App Router, TypeScript), React 19
 - Supabase: Postgres with Row Level Security, Auth (email and password), Storage
-- No prices are stored or shown anywhere. Buyers ask on WhatsApp.
+- A gecko's price is optional. When the owner enters one it is shown next to geckos that are not sold, and the catalogue can sort by price. Buyers still ask on WhatsApp.
 
 ## Routes
 

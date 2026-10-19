@@ -29,7 +29,7 @@ function fail(message: string): Loaded<never> {
 }
 
 const GECKO_SELECT =
-  'id, code, slug, name, morph, line_id, description, sex, hatch_date, weight_grams, lineage, sire_id, dam_id, status, visibility, featured, published, archived, seo_title, seo_description, created_at, updated_at, line:signature_lines(id, slug, name), photos:gecko_photos(id, gecko_id, storage_path, alt, sort_order, is_cover, width, height)'
+  'id, code, slug, name, morph, line_id, description, sex, hatch_date, weight_grams, lineage, sire_id, dam_id, sire_name, dam_name, price_idr, status, visibility, featured, published, archived, seo_title, seo_description, created_at, updated_at, line:signature_lines(id, slug, name), photos:gecko_photos(id, gecko_id, storage_path, alt, sort_order, is_cover, width, height)'
 
 function sortPhotos<T extends { photos: GeckoPhoto[] }>(g: T): T {
   const photos = [...(g.photos ?? [])].sort(
@@ -82,9 +82,12 @@ export async function listGeckos(
   if (filters.sex) query = query.eq('sex', filters.sex)
   if (filters.q) query = query.or(`name.ilike.%${filters.q}%,code.ilike.%${filters.q}%,morph.ilike.%${filters.q}%`)
 
-  if (filters.sort === 'name') query = query.order('name', { ascending: true })
-  else if (filters.sort === 'code') query = query.order('code', { ascending: true })
-  else query = query.order('created_at', { ascending: false })
+  if (filters.sort === 'price-high' || filters.sort === 'price-low') {
+    // Geckos without a price come last in both directions.
+    query = query.order('price_idr', { ascending: filters.sort === 'price-low', nullsFirst: false }).order('created_at', { ascending: false })
+  } else {
+    query = query.order('created_at', { ascending: filters.sort === 'oldest' })
+  }
 
   const { data, error } = await query.limit(200)
   if (error) return fail(error.message)

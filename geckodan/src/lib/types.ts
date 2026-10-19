@@ -41,6 +41,11 @@ export type Gecko = {
   lineage: string | null
   sire_id: string | null
   dam_id: string | null
+  /** A parent typed by hand. Empty when the parent is linked through sire_id. */
+  sire_name: string | null
+  dam_name: string | null
+  /** Price in rupiah, shown next to geckos that are not sold. */
+  price_idr: number | null
   status: GeckoStatus
   visibility: GeckoVisibility
   featured: boolean

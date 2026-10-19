@@ -56,7 +56,7 @@ export default async function DashboardPage() {
       <section className="admin-note">
         <h2>Aturan konten</h2>
         <ul>
-          <li>Harga tidak pernah ditampilkan di situs. Calon pembeli bertanya lewat WhatsApp.</li>
+          <li>Harga yang diisi di form gecko tampil di situs untuk gecko yang belum terjual. Kosongkan kalau tidak ingin menampilkannya. Calon pembeli tetap bertanya lewat WhatsApp.</li>
           <li>Gunakan foto asli gecko GeckoDan saja.</li>
           <li>Prestasi baru tayang setelah diverifikasi dan diberi bukti.</li>
           <li>Testimoni baru tayang setelah pelanggan memberi izin.</li>

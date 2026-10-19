@@ -39,6 +39,15 @@ export function formObject(formData: FormData): Record<string, string> {
   return out
 }
 
+/** The price in rupiah, as typed: "1500000", "1.500.000" or "Rp 1.500.000". Empty or 0 means no price. */
+export const priceSchema = z
+  .string()
+  .trim()
+  .refine((v) => /^(rp\.?\s*)?[\d.,\s]*$/i.test(v), 'Harga hanya boleh angka, contoh 1500000')
+  .transform((v) => v.replace(/\D/g, ''))
+  .transform((v) => (v === '' || Number(v) === 0 ? null : Number(v)))
+  .refine((v) => v === null || (Number.isSafeInteger(v) && v <= 100_000_000_000), 'Harga terlalu besar')
+
 export const geckoSchema = z
   .object({
     name: requiredText(120, 'Nama'),
@@ -62,8 +71,9 @@ export const geckoSchema = z
       .transform((v) => (v === '' ? null : Number(v.replace(',', '.'))))
       .refine((v) => v === null || (Number.isFinite(v) && v > 0 && v < 1000), 'Berat harus angka antara 0 dan 1000 gram'),
     lineage: optionalText(4000),
-    sire_id: optionalUuid,
-    dam_id: optionalUuid,
+    sire_name: optionalText(120),
+    dam_name: optionalText(120),
+    price_idr: priceSchema,
     status: z.enum(['available', 'reserved', 'sold']),
     visibility: z.enum(['for_sale', 'showcase', 'both']),
     featured: checkbox,

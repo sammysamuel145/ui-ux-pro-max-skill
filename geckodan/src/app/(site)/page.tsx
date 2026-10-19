@@ -20,7 +20,7 @@ import {
 } from '@/lib/data/public'
 import { siteUrl } from '@/lib/env'
 import { mediaUrl } from '@/lib/media'
-import { excerpt, paragraphs } from '@/lib/text'
+import { excerpt, formatRupiah, paragraphs } from '@/lib/text'
 import { geckoInquiryMessage, stockInquiryMessage, whatsappLink } from '@/lib/whatsapp'
 import './home.css'
 
@@ -104,7 +104,7 @@ export default async function HomePage() {
                 Geckos
               </h2>
               <div className="catalog__aside">
-                <p>Geckos available right now. Price and availability are confirmed directly on WhatsApp.</p>
+                <p>Geckos available right now. Availability is confirmed directly on WhatsApp.</p>
                 <Link className="text-arrow" href="/geckos">
                   View all geckos <ArrowIcon />
                 </Link>
@@ -141,6 +141,7 @@ export default async function HomePage() {
                           <Link href={href}>{g.name}</Link>
                         </h3>
                         <p className="gecko__meta">{[`ID ${g.code}`, g.morph, g.line?.name].filter(Boolean).join(' · ')}</p>
+                        {g.status !== 'sold' && g.price_idr ? <p className="price">{formatRupiah(g.price_idr)}</p> : null}
                         <p className="gecko__actions">
                           <Link href={href} className="pill">
                             Details

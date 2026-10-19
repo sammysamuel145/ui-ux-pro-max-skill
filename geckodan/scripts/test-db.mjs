@@ -142,6 +142,58 @@ try {
     await admin.from('geckos').update({ archived: false }).eq('id', publishedId)
   }
 
+  console.log('Prices and typed parents')
+  {
+    const { data: more, error } = await admin
+      .from('geckos')
+      .insert([
+        { ...base, code: `T${stamp}X`, slug: `t-${stamp}-x`, name: 'Test cheap', published: true, price_idr: 1000000 },
+        { ...base, code: `T${stamp}Y`, slug: `t-${stamp}-y`, name: 'Test dear', published: true, price_idr: 9000000 },
+        { ...base, code: `T${stamp}Z`, slug: `t-${stamp}-z`, name: 'Test unpriced', published: true },
+        { ...base, code: `T${stamp}W`, slug: `t-${stamp}-w`, name: 'Test draft priced', published: false, price_idr: 5000000 },
+      ])
+      .select('id, code')
+    check('an admin can add geckos with and without a price', !error && more?.length === 4, error?.message)
+    const idOf = (suffix) => more.find((g) => g.code === `T${stamp}${suffix}`).id
+    const [cheap, dear, unpriced, pricedDraft] = [idOf('X'), idOf('Y'), idOf('Z'), idOf('W')]
+    created.geckos.push(cheap, dear, unpriced, pricedDraft)
+
+    const { error: zero } = await admin.from('geckos').update({ price_idr: 0 }).eq('id', unpriced)
+    const { error: negative } = await admin.from('geckos').update({ price_idr: -5 }).eq('id', unpriced)
+    check('a zero or negative price is rejected', !!zero && !!negative)
+
+    const { data: publicRow } = await anon.from('geckos').select('price_idr').eq('id', dear).single()
+    check('the price of a published gecko is public', Number(publicRow?.price_idr) === 9000000)
+    const { data: draftRow } = await anon.from('geckos').select('price_idr').eq('id', pricedDraft)
+    check('the price of a draft gecko stays hidden from the public', draftRow?.length === 0)
+    const { data: userChange } = await user.from('geckos').update({ price_idr: 1 }).eq('id', dear).select('id')
+    const { data: anonChange } = await anon.from('geckos').update({ price_idr: 1 }).eq('id', dear).select('id')
+    check('only an admin can change a price', (!userChange || userChange.length === 0) && (!anonChange || anonChange.length === 0))
+    const { data: still } = await service.from('geckos').select('price_idr').eq('id', dear).single()
+    check('the price is unchanged after those attempts', Number(still?.price_idr) === 9000000)
+
+    const ours = [cheap, dear, unpriced]
+    const sorted = async (ascending) => {
+      const { data } = await anon
+        .from('geckos')
+        .select('id')
+        .in('id', ours)
+        .order('price_idr', { ascending, nullsFirst: false })
+      return (data ?? []).map((g) => g.id)
+    }
+    const high = await sorted(false)
+    const low = await sorted(true)
+    check('sorting by price, high to low, puts unpriced last', JSON.stringify(high) === JSON.stringify([dear, cheap, unpriced]), JSON.stringify(high))
+    check('and low to high, unpriced still last', JSON.stringify(low) === JSON.stringify([cheap, dear, unpriced]), JSON.stringify(low))
+
+    // Typed parents are plain text on the gecko row.
+    const { error: e4 } = await admin.from('geckos').update({ sire_name: 'Big Orange', dam_name: 'Sunny' }).eq('id', cheap)
+    const { data: parents } = await anon.from('geckos').select('sire_name, dam_name').eq('id', cheap).single()
+    check('typed parents are stored and public', !e4 && parents?.sire_name === 'Big Orange' && parents?.dam_name === 'Sunny')
+    const { error: e5 } = await admin.from('geckos').update({ sire_name: 'x'.repeat(121) }).eq('id', cheap)
+    check('a parent name over 120 characters is rejected', !!e5)
+  }
+
   console.log('Awards and testimonials')
   {
     const { error } = await admin.from('awards').insert({ title: 'Test award', published: true, verified: false })

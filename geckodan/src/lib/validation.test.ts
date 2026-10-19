@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { awardSchema, businessSchema, geckoSchema, heroSchema, lineSchema, newLineSchema, socialsSchema } from './validation'
+import { awardSchema, businessSchema, geckoSchema, heroSchema, lineSchema, newLineSchema, priceSchema, socialsSchema } from './validation'
 
 const gecko = {
   name: 'Test Gecko',
@@ -12,8 +12,9 @@ const gecko = {
   hatch_date: '',
   weight_grams: '',
   lineage: '',
-  sire_id: '',
-  dam_id: '',
+  sire_name: '',
+  dam_name: '',
+  price_idr: '',
   status: 'available',
   visibility: 'for_sale',
   seo_title: '',
@@ -36,15 +37,16 @@ describe('geckoSchema', () => {
     expect(r.weight_grams).toBe(45.5)
   })
 
-  it('rejects an invalid code, status or parent id', () => {
+  it('rejects an invalid code or status', () => {
     expect(geckoSchema.safeParse({ ...gecko, code: 'bad code!' }).success).toBe(false)
     expect(geckoSchema.safeParse({ ...gecko, status: 'cheap' }).success).toBe(false)
-    expect(geckoSchema.safeParse({ ...gecko, sire_id: "x' or 1=1" }).success).toBe(false)
   })
 
-  it('has no price field', () => {
-    const r = geckoSchema.parse({ ...gecko, price: '1000000' })
-    expect('price' in r).toBe(false)
+  it('has no price unless one is entered', () => {
+    expect(geckoSchema.parse(gecko).price_idr).toBeNull()
+    expect(geckoSchema.parse({ ...gecko, price_idr: '1500000' }).price_idr).toBe(1500000)
+    expect(geckoSchema.parse({ ...gecko, price_idr: '0' }).price_idr).toBeNull()
+    expect(geckoSchema.safeParse({ ...gecko, price_idr: 'mahal' }).success).toBe(false)
   })
 })
 
@@ -103,5 +105,21 @@ describe('settings schemas', () => {
     expect(lineSchema.parse({ ...edit, name: '  Nova  ' }).name).toBe('Nova')
     expect(lineSchema.safeParse({ ...edit, name: '   ' }).success).toBe(false)
     expect(lineSchema.safeParse({ ...edit, name: 'x'.repeat(81) }).success).toBe(false)
+  })
+
+  it('takes typed parents as free text', () => {
+    const r = geckoSchema.parse({ ...gecko, sire_name: '  Big Orange  ', dam_name: '' })
+    expect(r.sire_name).toBe('Big Orange')
+    expect(r.dam_name).toBeNull()
+    expect(geckoSchema.safeParse({ ...gecko, sire_name: 'x'.repeat(121) }).success).toBe(false)
+  })
+
+  it('reads a price in rupiah', () => {
+    expect(priceSchema.parse('1500000')).toBe(1500000)
+    expect(priceSchema.parse('Rp 1.500.000')).toBe(1500000)
+    expect(priceSchema.parse('')).toBeNull()
+    expect(priceSchema.safeParse('1 juta').success).toBe(false)
+    expect(priceSchema.safeParse('9'.repeat(15)).success).toBe(false)
+    expect(priceSchema.parse('0')).toBeNull()
   })
 })

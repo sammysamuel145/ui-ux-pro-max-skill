@@ -1,6 +1,6 @@
 import type { GeckoSex, GeckoStatus } from './types'
 
-export type CatalogSort = 'newest' | 'name' | 'code'
+export type CatalogSort = 'newest' | 'oldest' | 'price-high' | 'price-low'
 export type StatusFilter = GeckoStatus | 'all' | 'open'
 
 export type CatalogFilters = {
@@ -13,7 +13,7 @@ export type CatalogFilters = {
 
 const STATUS_VALUES: StatusFilter[] = ['open', 'available', 'reserved', 'sold', 'all']
 const SEX_VALUES: Array<GeckoSex | ''> = ['', 'male', 'female', 'unknown']
-const SORT_VALUES: CatalogSort[] = ['newest', 'name', 'code']
+const SORT_VALUES: CatalogSort[] = ['newest', 'oldest', 'price-high', 'price-low']
 
 function first(v: string | string[] | undefined): string {
   return (Array.isArray(v) ? v[0] : v) ?? ''
@@ -59,5 +59,5 @@ export function statusesFor(filter: StatusFilter): GeckoStatus[] {
 }
 
 export function hasActiveFilters(f: CatalogFilters): boolean {
-  return Boolean(f.q || f.line || f.sex || f.status !== 'open')
+  return Boolean(f.q || f.line || f.sex || f.status !== 'open' || f.sort !== 'newest')
 }

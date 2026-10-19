@@ -10,7 +10,7 @@ import { getGeckoBySlug, getSettings } from '@/lib/data/public'
 import { siteUrl } from '@/lib/env'
 import { SEX_LABEL, STATUS_HINT, VISIBILITY_LABEL } from '@/lib/labels'
 import { mediaUrl } from '@/lib/media'
-import { excerpt, formatDate, paragraphs } from '@/lib/text'
+import { excerpt, formatDate, formatRupiah, paragraphs } from '@/lib/text'
 import { geckoInquiryMessage, similarInquiryMessage, whatsappLink } from '@/lib/whatsapp'
 
 export const revalidate = 60
@@ -95,6 +95,7 @@ export default async function GeckoPage({ params }: Props) {
         <aside className="record" aria-label="Breeder record">
           <h1>{g.name}</h1>
           <p className="record__code">ID {g.code}</p>
+          {forSale && g.status !== 'sold' && g.price_idr ? <p className="price price--large">{formatRupiah(g.price_idr)}</p> : null}
           <div style={{ marginTop: 20 }}>
             {forSale ? (
               <>
@@ -138,23 +139,31 @@ export default async function GeckoPage({ params }: Props) {
                 <dd>{g.weight_grams} g</dd>
               </>
             ) : null}
-            {g.sire ? (
+            {g.sire || g.sire_name ? (
               <>
                 <dt>Sire</dt>
                 <dd>
-                  <Link className="text-link" href={`/geckos/${g.sire.slug}`}>
-                    {g.sire.name} ({g.sire.code})
-                  </Link>
+                  {g.sire ? (
+                    <Link className="text-link" href={`/geckos/${g.sire.slug}`}>
+                      {g.sire.name} ({g.sire.code})
+                    </Link>
+                  ) : (
+                    g.sire_name
+                  )}
                 </dd>
               </>
             ) : null}
-            {g.dam ? (
+            {g.dam || g.dam_name ? (
               <>
                 <dt>Dam</dt>
                 <dd>
-                  <Link className="text-link" href={`/geckos/${g.dam.slug}`}>
-                    {g.dam.name} ({g.dam.code})
-                  </Link>
+                  {g.dam ? (
+                    <Link className="text-link" href={`/geckos/${g.dam.slug}`}>
+                      {g.dam.name} ({g.dam.code})
+                    </Link>
+                  ) : (
+                    g.dam_name
+                  )}
                 </dd>
               </>
             ) : null}
@@ -188,7 +197,7 @@ export default async function GeckoPage({ params }: Props) {
                 Ask about similar geckos
               </a>
             )}
-            <p className="small soft">Prices are not shown on this site. A WhatsApp message is not a purchase: GeckoDan will confirm availability.</p>
+            <p className="small soft">A WhatsApp message is not a purchase: GeckoDan will confirm availability.</p>
           </div>
         </aside>
       </div>
