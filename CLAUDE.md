@@ -207,7 +207,7 @@ Google Maps:
 https://share.google/djs93Utk6ol35s2kV
 
 Facebook:
-https://www.facebook.com/share/1C2cfuuTPd/?mibextid=wwXIfr
+https://www.facebook.com/share/1CvQh25YDE/
 
 TikTok:
 https://www.tiktok.com/@geckodan_?_r=1&_t=ZS-9AeXmIbtv5Z

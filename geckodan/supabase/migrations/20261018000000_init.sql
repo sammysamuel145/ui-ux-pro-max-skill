@@ -405,7 +405,7 @@ insert into public.site_settings (key, value) values
     'experience_text', ''
   )),
   ('socials', jsonb_build_object(
-    'facebook', 'https://www.facebook.com/share/1C2cfuuTPd/?mibextid=wwXIfr',
+    'facebook', 'https://www.facebook.com/share/1CvQh25YDE/',
     'instagram', 'https://www.instagram.com/geck_dan?vrfl=M24zYnlqMXZhMDFv',
     'tiktok', 'https://www.tiktok.com/@geckodan_?_r=1&_t=ZS-9AeXmIbtv5Z',
     'youtube', 'https://youtube.com/@joreptile?si=hS67ZZWEuqj8zZTC',

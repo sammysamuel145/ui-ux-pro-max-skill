@@ -119,5 +119,3 @@ The site shows labelled placeholders ("Konten menyusul", "Foto menyusul",
   share link opens a Google search, not a place page, so the write-review link
   cannot be derived from it.
 - FAQ answers and the shipping policy as actually practised.
-- Confirmation that the Facebook link (it opens the profile `rikuo.nura1`) is
-  the account GeckoDan wants to show.
