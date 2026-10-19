@@ -18,10 +18,9 @@ export function Hero({ settings }: { settings: SiteSettings }) {
   const hero: HeroSettings = settings.hero
   const uploaded = mediaUrl(hero.image_path)
   const [line1, line2] = splitHeadline(hero.headline)
-  const isConcept = !uploaded || hero.image_is_concept
   const alt = uploaded
     ? hero.image_alt || 'Leopard gecko among tropical foliage'
-    : 'Concept illustration: an orange leopard gecko on a mossy rock in a tropical forest'
+    : 'An orange leopard gecko on a mossy rock in a tropical forest'
 
   return (
     <section className="hero" aria-labelledby="hero-title">
@@ -60,9 +59,6 @@ export function Hero({ settings }: { settings: SiteSettings }) {
           </p>
         </div>
       </div>
-      {isConcept ? (
-        <p className="hero__caption">Concept illustration, not a photograph of a GeckoDan animal.</p>
-      ) : null}
     </section>
   )
 }

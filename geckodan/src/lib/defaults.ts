@@ -29,7 +29,6 @@ export const DEFAULT_SETTINGS: SiteSettings = {
     cta_href: '/geckos',
     image_path: '',
     image_alt: '',
-    image_is_concept: true,
   },
   story: { title: 'Our Story', body: '', signature: '', image_path: '', image_alt: '' },
   shipping: { body: '' },

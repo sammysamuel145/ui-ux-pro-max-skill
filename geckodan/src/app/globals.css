@@ -701,17 +701,6 @@ body:has(.hero) .site-header :focus-visible {
   flex: none;
 }
 
-.hero__caption {
-  position: absolute;
-  right: var(--margin);
-  bottom: calc(clamp(24px, 4vh, 40px) + 64px);
-  max-width: 24ch;
-  font-size: 0.8125rem;
-  line-height: 1.4;
-  text-align: right;
-  color: var(--on-night-soft);
-}
-
 @media (max-width: 900px) {
   .hero {
     min-height: 100svh;
@@ -739,13 +728,6 @@ body:has(.hero) .site-header :focus-visible {
   .hero__inner {
     padding-top: 0;
     margin-top: -64px;
-  }
-  .hero__caption {
-    position: static;
-    margin-top: 16px;
-    padding-inline: var(--margin);
-    text-align: left;
-    max-width: none;
   }
   .hero .btn {
     width: 100%;

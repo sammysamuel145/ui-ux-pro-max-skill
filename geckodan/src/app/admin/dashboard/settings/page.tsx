@@ -115,14 +115,14 @@ export default async function AdminSettingsPage() {
         {heroSrc ? (
           <div className="photo-card" style={{ maxWidth: 420 }}>
             <AdminImage src={heroSrc} alt={hero.image_alt} size={420} />
-            <ActionForm action={removeHeroImage} confirm="Kembali ke ilustrasi konsep?" label="Hapus gambar hero">
+            <ActionForm action={removeHeroImage} confirm="Kembali ke gambar hero bawaan?" label="Hapus gambar hero">
               <SubmitButton small variant="btn-quiet">
-                Kembali ke ilustrasi konsep
+                Kembali ke gambar bawaan
               </SubmitButton>
             </ActionForm>
           </div>
         ) : (
-          <p className="soft">Saat ini hero memakai ilustrasi konsep yang disetujui, dengan keterangan bahwa itu bukan foto hewan GeckoDan.</p>
+          <p className="soft">Saat ini hero memakai gambar bawaan situs.</p>
         )}
         <PhotoUploader folder="site/hero" attach={attachHeroImage} multiple={false} label="Unggah foto hero asli" />
       </section>
@@ -139,10 +139,6 @@ export default async function AdminSettingsPage() {
             <Text id="hero.cta_href" label="Tujuan tombol" value={hero.cta_href} required maxLength={200} hint="Tautan internal, contoh /geckos." />
           </div>
           <Text id="hero.image_alt" label="Deskripsi gambar hero" value={hero.image_alt} maxLength={300} />
-          <label className="check">
-            <input type="checkbox" name="image_is_concept" defaultChecked={hero.image_is_concept} />
-            Gambar hero adalah ilustrasi konsep (tampilkan keterangan)
-          </label>
         </fieldset>
         <div>
           <SubmitButton variant="btn-primary">Simpan hero</SubmitButton>

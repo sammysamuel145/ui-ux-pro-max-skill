@@ -236,8 +236,6 @@ async function attachSiteImage(kind: keyof typeof SITE_IMAGES, path: string, alt
   const oldPath = (current?.value as Record<string, string> | undefined)?.[cfg.field]
   const cleanAlt = String(alt ?? '').trim().slice(0, 300)
   const patch: Record<string, unknown> = { [cfg.field]: path }
-  // A newly uploaded hero is the owner's own photo, not the concept illustration.
-  if (kind === 'hero') patch.image_is_concept = false
   if (cfg.altField && cleanAlt) patch[cfg.altField] = cleanAlt
   const state = await mergeSetting(supabase, cfg.setting, patch)
   if (!state?.ok) {
@@ -268,7 +266,7 @@ export async function attachOgImage(path: string) {
   return attachSiteImage('og', path, '')
 }
 export async function removeHeroImage() {
-  return clearSiteImage('hero', { image_is_concept: true }, 'Hero kembali memakai ilustrasi konsep.')
+  return clearSiteImage('hero', {}, 'Hero kembali memakai gambar bawaan.')
 }
 export async function removeStoryImage() {
   return clearSiteImage('story', {}, 'Foto Our Story dihapus.')
