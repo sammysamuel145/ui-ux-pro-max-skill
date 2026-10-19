@@ -107,7 +107,12 @@ export default async function EditGeckoPage({ params, searchParams }: Props) {
 
       <section aria-labelledby="data-title" className="admin-section">
         <h2 id="data-title">Data gecko</h2>
-        <GeckoForm action={saveGecko.bind(null, gecko.id)} gecko={gecko} lines={lines.data ?? []} parents={parents.data ?? []} />
+        <GeckoForm
+          action={saveGecko.bind(null, gecko.id)}
+          gecko={gecko}
+          lines={lines.data ?? []}
+          parents={parents.data ?? []}
+        />
       </section>
 
       <section aria-labelledby="danger-title" className="admin-section">

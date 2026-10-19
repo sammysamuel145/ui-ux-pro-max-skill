@@ -15,6 +15,11 @@ export function excerpt(text: string | null | undefined, max = 180): string {
   return `${cut.slice(0, Math.max(cut.lastIndexOf(' '), max - 20)).trimEnd()}…`
 }
 
+/** 1500000 -> "Rp 1.500.000". Written out so it does not depend on the runtime's locale data. */
+export function formatRupiah(amount: number): string {
+  return `Rp ${Math.round(amount).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')}`
+}
+
 export function slugify(input: string): string {
   return input
     .normalize('NFKD')

@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { SEX_LABEL } from '@/lib/labels'
+import { formatRupiah } from '@/lib/text'
 import type { GeckoWithRelations } from '@/lib/types'
 import { GeckoImage } from './GeckoImage'
 import { Status } from './Status'
@@ -23,6 +24,7 @@ export function GeckoCard({ gecko, showStatus = true }: { gecko: GeckoWithRelati
           {gecko.line ? <span>Line {gecko.line.name}</span> : null}
           {gecko.sex !== 'unknown' ? <span>{SEX_LABEL[gecko.sex]}</span> : null}
         </p>
+        {forSale && gecko.status !== 'sold' && gecko.price_idr ? <p className="price">{formatRupiah(gecko.price_idr)}</p> : null}
       </div>
       <div className="gecko-card__actions">
         {showStatus && forSale ? <Status status={gecko.status} /> : <span className="small soft">Koleksi</span>}

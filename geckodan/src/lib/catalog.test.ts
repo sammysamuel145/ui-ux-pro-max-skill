@@ -22,13 +22,17 @@ describe('parseCatalogFilters', () => {
     })
   })
   it('accepts valid values and the first of repeated params', () => {
-    expect(parseCatalogFilters({ q: ['Sol', 'x'], line: 'MANTRA', status: 'sold', sex: 'female', sort: 'name' })).toEqual({
+    expect(parseCatalogFilters({ q: ['Sol', 'x'], line: 'MANTRA', status: 'sold', sex: 'female', sort: 'price-high' })).toEqual({
       q: 'Sol',
       line: 'mantra',
       status: 'sold',
       sex: 'female',
-      sort: 'name',
+      sort: 'price-high',
     })
+  })
+  it('offers newest, oldest and the two price orders, and nothing else', () => {
+    for (const sort of ['newest', 'oldest', 'price-high', 'price-low']) expect(parseCatalogFilters({ sort }).sort).toBe(sort)
+    for (const sort of ['name', 'code', 'price', '']) expect(parseCatalogFilters({ sort }).sort).toBe('newest')
   })
 })
 
@@ -44,5 +48,6 @@ describe('hasActiveFilters', () => {
   it('is false for the default view only', () => {
     expect(hasActiveFilters(parseCatalogFilters({}))).toBe(false)
     expect(hasActiveFilters(parseCatalogFilters({ q: 'sol' }))).toBe(true)
+    expect(hasActiveFilters(parseCatalogFilters({ sort: 'oldest' }))).toBe(true)
   })
 })

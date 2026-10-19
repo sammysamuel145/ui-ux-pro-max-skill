@@ -936,6 +936,19 @@ body:has(.hero) .site-header :focus-visible {
   color: var(--ink-soft);
 }
 
+.price {
+  margin-top: 6px;
+  font-size: 1.125rem;
+  font-weight: 600;
+  line-height: 1.2;
+  font-variant-numeric: lining-nums tabular-nums;
+}
+
+.price--large {
+  margin-top: 14px;
+  font-size: clamp(1.5rem, 1.2rem + 1vw, 2rem);
+}
+
 .gecko-card__actions {
   display: flex;
   flex-wrap: wrap;
@@ -974,7 +987,7 @@ body:has(.hero) .site-header :focus-visible {
 
 .filters {
   display: grid;
-  grid-template-columns: minmax(0, 2fr) repeat(4, minmax(0, 1fr)) auto;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) auto;
   gap: 12px;
   align-items: end;
   margin-bottom: clamp(32px, 4vw, 56px);

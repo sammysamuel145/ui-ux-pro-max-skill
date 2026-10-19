@@ -199,7 +199,7 @@ try {
     message,
   )
   const html = await visitor.content()
-  check('no price is shown', !/Rp\s?\d|harga:\s*\d/i.test(html))
+  check('a gecko with no price shows none', !/Rp\s?\d|harga:\s*\d/i.test(html))
 
   await visitor.goto(`${BASE}/geckos?q=${encodeURIComponent(code)}`)
   check('the catalog search finds the gecko', (await visitor.getByText(name).count()) > 0)
@@ -269,6 +269,122 @@ try {
   for (const folder of ['site/hero', 'site/story', 'site/og']) left.push(...((await service.storage.from('media').list(folder)).data ?? []).filter((o) => o.name !== '.emptyFolderPlaceholder'))
   check('the removed site pictures are deleted from Storage', left.length === 0, left.map((o) => o.name).join(','))
   await ctx2.close()
+
+  console.log('Parents, prices and the catalogue controls')
+  {
+  const tag = String(stamp).slice(-6)
+    // The success message of an earlier save stays on screen, so wait for the button to finish instead.
+    const save = async () => {
+      await page.getByRole('button', { name: 'Simpan perubahan' }).click()
+      await page.waitForTimeout(200)
+      await page.waitForFunction(() => !document.querySelector('button[aria-busy="true"]'), null, { timeout: 15000 })
+    }
+  const fetchHtml = async (path) => (await fetch(`${BASE}${path}`)).text()
+  const listedName = `E2E Listed Sire ${tag}`
+  const listedCode = `E2E-LS${tag}`
+  const parentsName = `E2E Parents ${tag}`
+
+  // A gecko with parents typed by hand and a private price.
+  await page.goto(`${BASE}/admin/dashboard/geckos/new`)
+  await page.getByLabel('Nama', { exact: true }).fill(parentsName)
+  await page.getByLabel('ID gecko').fill(`E2E-PA${tag}`)
+  await page.getByLabel('Induk jantan (sire)').fill(`Wild Sire ${tag}`)
+  await page.getByLabel('Induk betina (dam)').fill(`Wild Dam ${tag}`)
+  await page.getByLabel('Harga (Rp)').fill('Rp 2.500.000')
+  await page.getByLabel('Publikasikan di situs').check()
+  await page.getByRole('button', { name: 'Buat gecko' }).click()
+  await page.waitForURL(/\/admin\/dashboard\/geckos\/[0-9a-f-]{36}\?created=1/)
+  const parentsId = page.url().match(/geckos\/([0-9a-f-]{36})/)[1]
+  const { data: typed } = await service.from('geckos').select('slug, sire_id, sire_name, dam_id, dam_name').eq('id', parentsId).single()
+  check('parents can be typed as free text', typed.sire_name === `Wild Sire ${tag}` && typed.dam_name === `Wild Dam ${tag}` && typed.sire_id === null && typed.dam_id === null, JSON.stringify(typed))
+  const { data: storedPrice } = await service.from('geckos').select('price_idr').eq('id', parentsId).single()
+  check('the price is stored as a number', Number(storedPrice?.price_idr) === 2500000)
+  check('the form shows the typed parents and the price again', (await page.getByLabel('Induk jantan (sire)').inputValue()) === `Wild Sire ${tag}` && (await page.getByLabel('Harga (Rp)').inputValue()) === '2500000')
+  const typedPage = await fetchHtml(`/geckos/${typed.slug}`)
+  check('the typed parents show on the public page', typedPage.includes(`Wild Sire ${tag}`) && typedPage.includes(`Wild Dam ${tag}`))
+  check('the price is shown on the public page', typedPage.includes('Rp 2.500.000'))
+
+  // Typing the name or ID of a listed gecko links the parent to it.
+  const { data: listed } = await service
+    .from('geckos')
+    .insert({ code: listedCode, slug: `e2e-listed-sire-${tag}`, name: listedName, sex: 'male', published: true })
+    .select('id')
+    .single()
+  await page.getByLabel('Induk jantan (sire)').fill(listedName)
+  await page.getByLabel('Induk betina (dam)').fill(listedCode.toLowerCase())
+  await save()
+  const { data: linked } = await service.from('geckos').select('sire_id, sire_name, dam_id, dam_name').eq('id', parentsId).single()
+  check('a typed name links the parent to the listed gecko', linked.sire_id === listed.id && linked.sire_name === null, JSON.stringify(linked))
+  check('a typed ID links too, whatever its letter case', linked.dam_id === listed.id && linked.dam_name === null)
+  check('the linked parent shows its current name on the form', (await page.getByLabel('Induk jantan (sire)').inputValue()) === listedName)
+  const linkedPage = await fetchHtml(`/geckos/${typed.slug}`)
+  check('the public page links to the listed parent', linkedPage.includes(`href="/geckos/e2e-listed-sire-${tag}"`))
+
+  // A gecko cannot be its own parent.
+  await page.getByLabel('Induk jantan (sire)').fill(parentsName)
+  await page.getByRole('button', { name: 'Simpan perubahan' }).click()
+  await page.getByText('tidak bisa menjadi induknya sendiri').waitFor({ timeout: 10000 })
+  const { data: afterSelf } = await service.from('geckos').select('sire_id').eq('id', parentsId).single()
+  check('a gecko cannot be its own parent', afterSelf.sire_id === listed.id)
+
+  // An invalid price is refused, and clearing the price removes it.
+  await page.getByLabel('Induk jantan (sire)').fill(listedName)
+  await page.getByLabel('Harga (Rp)').fill('dua juta')
+  await page.getByRole('button', { name: 'Simpan perubahan' }).click()
+  await page.getByText('Harga hanya boleh angka').waitFor({ timeout: 10000 })
+  const { data: keep } = await service.from('geckos').select('price_idr').eq('id', parentsId).single()
+  check('an invalid price is refused and the old one stays', Number(keep?.price_idr) === 2500000)
+
+  // A sold gecko shows no price; clearing the price removes it.
+  await page.getByLabel('Harga (Rp)').fill('2.500.000')
+  await page.getByLabel('Status penjualan').selectOption('sold')
+  await save()
+  check('a sold gecko shows no price', !(await fetchHtml(`/geckos/${typed.slug}`)).includes('Rp 2.500.000'))
+  await page.getByLabel('Status penjualan').selectOption('available')
+  await page.getByLabel('Harga (Rp)').fill('')
+  await save()
+  const { data: cleared } = await service.from('geckos').select('price_idr').eq('id', parentsId).single()
+  const clearedPage = []
+  for (let i = 0; i < 6; i++) {
+    const body = await fetchHtml(`/geckos/${typed.slug}`)
+    clearedPage.push(body.includes('Rp 2.500.000') ? 'price' : 'clean')
+    if (clearedPage.at(-1) === 'clean') break
+    await new Promise((r) => setTimeout(r, 1500))
+  }
+  check('clearing the price removes it from the record and the page', cleared.price_idr === null && clearedPage.at(-1) === 'clean', JSON.stringify({ db: cleared.price_idr, page: clearedPage }))
+  await page.getByLabel('Harga (Rp)').fill('2.500.000')
+  await save()
+
+  // The catalogue has search and sort only.
+  await page.goto(`${BASE}/geckos`)
+  check('the catalogue has no line, status or sex filter', (await page.locator('#line, #status, #sex').count()) === 0)
+  check('it keeps the search box', (await page.locator('#q').count()) === 1)
+  const sortLabels = await page.locator('#sort option').allTextContents()
+  check('sort offers newest, oldest and both price orders', JSON.stringify(sortLabels) === JSON.stringify(['Newest', 'Oldest', 'Price: high to low', 'Price: low to high']), sortLabels.join(' | '))
+  await page.goto(`${BASE}/geckos?line=mantra`)
+  check('a line chosen through a link survives the Apply button', (await page.locator('form.filters input[name="line"]').getAttribute('value')) === 'mantra')
+
+  // Each sort order, with known prices. Unpriced geckos come last in both price orders.
+  const mk = async (name, code, price) => {
+    await service.from('geckos').insert({ code, slug: code.toLowerCase(), name, published: true, price_idr: price })
+  }
+  await mk(`E2E Cheap ${tag}`, `E2E-CH${tag}`, 1000000)
+  await mk(`E2E Dear ${tag}`, `E2E-DE${tag}`, 9000000)
+  const names = [`E2E Dear ${tag}`, parentsName, `E2E Cheap ${tag}`, listedName]
+  const orderOf = async (sort) => {
+    const body = await fetchHtml(`/geckos?q=${tag}&sort=${sort}`)
+    return names.map((n) => [n, body.indexOf(n)]).filter(([, i]) => i >= 0).sort((a, b) => a[1] - b[1]).map(([n]) => n)
+  }
+  const expect = (list) => JSON.stringify(list)
+  const cheap = `E2E Cheap ${tag}`
+  const dear = `E2E Dear ${tag}`
+  check('price: high to low', expect(await orderOf('price-high')) === expect([dear, parentsName, cheap, listedName]))
+  check('price: low to high', expect(await orderOf('price-low')) === expect([cheap, parentsName, dear, listedName]))
+  check('newest first', expect(await orderOf('newest')) === expect([dear, cheap, listedName, parentsName]))
+  check('oldest first', expect(await orderOf('oldest')) === expect([parentsName, listedName, cheap, dear]))
+  const sorted = await fetchHtml(`/geckos?q=${tag}&sort=price-high`)
+  check('the catalogue shows each price', ['Rp 9.000.000', 'Rp 2.500.000', 'Rp 1.000.000'].every((v) => sorted.includes(v)))
+  }
 
   console.log('Signature lines')
   const lineName = `E2E Orion ${String(stamp).slice(-6)}`
@@ -367,8 +483,8 @@ try {
   check('an empty line can be deleted', lineGone?.length === 0)
   // A cached page can be served once more while it refreshes, so allow a few seconds.
   const statuses = []
-  for (let i = 0; i < 6 && statuses.at(-1) !== 404; i++) {
-    if (i) await new Promise((r) => setTimeout(r, 1500))
+  for (let i = 0; i < 15 && statuses.at(-1) !== 404; i++) {
+    if (i) await new Promise((r) => setTimeout(r, 2000))
     statuses.push((await fetch(`${BASE}/lines/${lineSlug}`)).status)
   }
   const goneStatus = statuses.at(-1)

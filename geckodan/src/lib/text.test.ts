@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { excerpt, formatDate, paragraphs, slugify } from './text'
+import { excerpt, formatDate, formatRupiah, paragraphs, slugify } from './text'
 
 describe('text helpers', () => {
   it('splits paragraphs on blank lines only', () => {
@@ -17,5 +17,12 @@ describe('text helpers', () => {
   it('formats dates in English (en-GB) without timezone drift', () => {
     expect(formatDate('2024-03-01')).toBe('1 March 2024')
     expect(formatDate('nope')).toBeNull()
+  })
+
+  it('writes rupiah with dots between thousands', () => {
+    expect(formatRupiah(1500000)).toBe('Rp 1.500.000')
+    expect(formatRupiah(750000)).toBe('Rp 750.000')
+    expect(formatRupiah(999)).toBe('Rp 999')
+    expect(formatRupiah(12000000000)).toBe('Rp 12.000.000.000')
   })
 })

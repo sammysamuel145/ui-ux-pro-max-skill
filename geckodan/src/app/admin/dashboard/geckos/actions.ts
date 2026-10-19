@@ -13,15 +13,41 @@ function assertId(id: unknown): string {
   return uuid.parse(id)
 }
 
+type Db = Awaited<ReturnType<typeof requireAdmin>>['supabase']
+
+const same = (a: string, b: string) => a.trim().toLowerCase() === b.trim().toLowerCase()
+
+/**
+ * A parent is typed by hand. When the text is the name or ID of a gecko that
+ * is listed, the parent is linked to it (and the link follows renames);
+ * otherwise only the typed name is kept. Returns null when the text names the
+ * gecko itself.
+ */
+async function resolveParent(
+  supabase: Db,
+  typed: string | null,
+  self: { id: string | null; name: string; code: string },
+): Promise<{ id: string | null; name: string | null } | null> {
+  if (!typed) return { id: null, name: null }
+  if (same(typed, self.name) || same(typed, self.code)) return null
+  const { data } = await supabase.from('geckos').select('id, name, code').limit(1000)
+  const match = (data ?? []).find((g) => g.id !== self.id && (same(typed, g.name as string) || same(typed, g.code as string)))
+  return match ? { id: match.id as string, name: null } : { id: null, name: typed }
+}
+
 export async function saveGecko(id: string | null, formData: FormData): Promise<ActionState> {
   const { supabase } = await requireAdmin()
   const parsed = geckoSchema.safeParse(formObject(formData))
   if (!parsed.success) return errorState(firstError(parsed.error))
-  const gecko = parsed.data
+  if (id) assertId(id)
+
+  const self = { id, name: parsed.data.name, code: parsed.data.code }
+  const sire = await resolveParent(supabase, parsed.data.sire_name, self)
+  const dam = await resolveParent(supabase, parsed.data.dam_name, self)
+  if (!sire || !dam) return errorState('Gecko tidak bisa menjadi induknya sendiri.')
+  const gecko = { ...parsed.data, sire_id: sire.id, sire_name: sire.name, dam_id: dam.id, dam_name: dam.name }
 
   if (id) {
-    assertId(id)
-    if (gecko.sire_id === id || gecko.dam_id === id) return errorState('Gecko tidak bisa menjadi induknya sendiri.')
     const { error } = await supabase.from('geckos').update(gecko).eq('id', id)
     if (error) return errorState(dbMessage(error))
     revalidateSite()
