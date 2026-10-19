@@ -17,7 +17,7 @@ an owner-only admin dashboard.
 | `/geckos` | Searchable, filterable catalog of for-sale geckos |
 | `/geckos/[slug]` | Gecko detail, gallery, record, lineage, WhatsApp inquiry |
 | `/showcase` | Collection geckos |
-| `/lines/mantra`, `/lines/kafka`, `/lines/valkrie` | Signature lines |
+| `/lines/<slug>` | Signature lines: MANTRA, KAFKA and VALKRIE to start; the owner adds more in the dashboard (Signature lines > Line baru) |
 | `/our-story`, `/achievements`, `/reviews`, `/faq`, `/shipping`, `/contact` | Content pages |
 
 | Admin (not indexed) | |

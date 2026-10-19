@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { awardSchema, businessSchema, geckoSchema, heroSchema, socialsSchema } from './validation'
+import { awardSchema, businessSchema, geckoSchema, heroSchema, newLineSchema, socialsSchema } from './validation'
 
 const gecko = {
   name: 'Test Gecko',
@@ -82,5 +82,18 @@ describe('settings schemas', () => {
     const award = { title: 'Juara 1', event_name: '', organizer: '', award_year: '2024', placement: '', gecko_id: '', description: '' }
     expect(awardSchema.safeParse({ ...award, evidence_url: 'ftp://x' }).success).toBe(false)
     expect(awardSchema.parse({ ...award, evidence_url: '' }).evidence_url).toBeNull()
+  })
+
+  it('builds the page address of a new line from its name', () => {
+    expect(newLineSchema.parse({ name: 'ORION', slug: '' })).toEqual({ name: 'ORION', slug: 'orion' })
+    expect(newLineSchema.parse({ name: '  Blue Moon  ' })).toEqual({ name: 'Blue Moon', slug: 'blue-moon' })
+    expect(newLineSchema.parse({ name: 'Orion', slug: 'Orion Prime!' }).slug).toBe('orion-prime')
+  })
+
+  it('rejects a new line without a usable name or address', () => {
+    expect(newLineSchema.safeParse({ name: '', slug: '' }).success).toBe(false)
+    expect(newLineSchema.safeParse({ name: '   ', slug: '' }).success).toBe(false)
+    expect(newLineSchema.safeParse({ name: '!!!', slug: '' }).success).toBe(false)
+    expect(newLineSchema.safeParse({ name: 'x'.repeat(81), slug: '' }).success).toBe(false)
   })
 })

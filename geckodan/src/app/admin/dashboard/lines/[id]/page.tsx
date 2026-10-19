@@ -6,10 +6,16 @@ import { PhotoUploader } from '@/components/admin/PhotoUploader'
 import { requireAdmin } from '@/lib/admin'
 import { mediaUrl } from '@/lib/media'
 import type { SignatureLine } from '@/lib/types'
-import { attachLineCover, removeLineCover, saveLine } from '../../content-actions'
+import { attachLineCover, deleteLine, removeLineCover, saveLine } from '../../content-actions'
 
-export default async function EditLinePage({ params }: { params: Promise<{ id: string }> }) {
+type Props = {
+  params: Promise<{ id: string }>
+  searchParams: Promise<Record<string, string | string[] | undefined>>
+}
+
+export default async function EditLinePage({ params, searchParams }: Props) {
   const { id } = await params
+  const created = (await searchParams).created === '1'
   if (!/^[0-9a-f-]{36}$/.test(id)) notFound()
   const { supabase } = await requireAdmin()
   const { data } = await supabase.from('signature_lines').select('*').eq('id', id).maybeSingle()
@@ -25,11 +31,18 @@ export default async function EditLinePage({ params }: { params: Promise<{ id: s
         </Link>
       </p>
       <header className="admin-head">
-        <h1 className="headline">Line {line.name}</h1>
+        <div>
+          <h1 className="headline">Line {line.name}</h1>
+          <p className="soft">
+            Alamat halaman: /lines/{line.slug} (tetap) · {line.published ? 'Tayang di situs' : 'Draft, belum tayang'}
+          </p>
+        </div>
         <Link className="btn btn-quiet" href={`/lines/${line.slug}`} target="_blank">
           Lihat halaman publik
         </Link>
       </header>
+
+      {created ? <p className="flash flash--ok">Line dibuat sebagai draft. Isi cerita dan foto sampul, lalu centang Tayang.</p> : null}
 
       <section className="admin-section" aria-labelledby="cover-title">
         <h2 id="cover-title">Foto sampul</h2>
@@ -85,6 +98,17 @@ export default async function EditLinePage({ params }: { params: Promise<{ id: s
           <div>
             <SubmitButton variant="btn-primary">Simpan line</SubmitButton>
           </div>
+        </ActionForm>
+      </section>
+
+      <section className="admin-section" aria-labelledby="line-danger-title">
+        <h2 id="line-danger-title">Hapus line</h2>
+        <p className="soft">
+          Untuk menyembunyikan line tanpa menghapusnya, matikan Tayang di atas. Hapus permanen hanya bisa kalau belum ada gecko
+          di line ini.
+        </p>
+        <ActionForm action={deleteLine.bind(null, line.id)} confirm={`Hapus line ${line.name} secara permanen?`} label="Hapus line">
+          <SubmitButton variant="btn-quiet">Hapus line</SubmitButton>
         </ActionForm>
       </section>
     </div>

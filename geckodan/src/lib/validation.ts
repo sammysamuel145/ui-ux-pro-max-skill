@@ -83,6 +83,17 @@ export const lineSchema = z.object({
   seo_description: optionalText(300),
 })
 
+export const newLineSchema = z
+  .object({
+    name: requiredText(80, 'Nama'),
+    slug: z.string().trim().max(80).optional().default(''),
+  })
+  .transform((l) => ({ name: l.name, slug: slugify(l.slug || l.name) }))
+  .refine((l) => /^[a-z0-9]+(-[a-z0-9]+)*$/.test(l.slug), {
+    message: 'Alamat halaman tidak valid. Pakai huruf, angka, dan tanda hubung.',
+    path: ['slug'],
+  })
+
 export const awardSchema = z
   .object({
     title: requiredText(200, 'Judul'),

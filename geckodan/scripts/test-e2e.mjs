@@ -270,6 +270,96 @@ try {
   check('the removed site pictures are deleted from Storage', left.length === 0, left.map((o) => o.name).join(','))
   await ctx2.close()
 
+  console.log('Signature lines')
+  const lineName = `E2E Orion ${String(stamp).slice(-6)}`
+  const lineSlug = lineName.toLowerCase().replace(/[^a-z0-9]+/g, '-')
+  const text = async (path) => (await fetch(`${BASE}${path}`)).text()
+  const lineLink = `href="/lines/${lineSlug}"`
+  const { data: beforeLines } = await service.from('signature_lines').select('id, sort_order').order('sort_order')
+
+  await page.goto(`${BASE}/admin/dashboard/lines`)
+  await page.getByRole('link', { name: 'Line baru' }).click()
+  await page.waitForURL('**/admin/dashboard/lines/new')
+  await page.getByLabel('Nama line').fill(lineName)
+  await page.getByRole('button', { name: 'Buat line' }).click()
+  await page.waitForURL(/\/admin\/dashboard\/lines\/[0-9a-f-]{36}\?created=1/)
+  const lineId = page.url().match(/lines\/([0-9a-f-]{36})/)[1]
+  check('the admin adds a new signature line', Boolean(lineId))
+  await page.getByText('Line dibuat sebagai draft').waitFor({ timeout: 10000 })
+
+  const { data: created } = await service.from('signature_lines').select('slug, name, published, sort_order').eq('id', lineId).single()
+  const maxBefore = Math.max(...(beforeLines ?? []).map((l) => l.sort_order))
+  check('its address is made from the name', created.slug === lineSlug, created.slug)
+  check('it starts as a draft at the end of the order', created.published === false && created.sort_order === maxBefore + 1, JSON.stringify(created))
+  check('a draft line has no public page', (await fetch(`${BASE}/lines/${lineSlug}`)).status === 404)
+  check('and is not in the menu or sitemap', !(await text('/')).includes(lineLink) && !(await text('/sitemap.xml')).includes(`/lines/${lineSlug}`))
+
+  await page.getByLabel('Tagline').fill('Test tagline')
+  await page.getByLabel('Deskripsi', { exact: true }).fill('Test story of the new line.')
+  await page.getByLabel('Tampilkan halaman line di situs').check()
+  await page.getByRole('button', { name: 'Simpan line' }).click()
+  await page.getByText('Line disimpan.').waitFor({ timeout: 10000 })
+
+  const home = await text('/')
+  check('a published line has a public page', (await fetch(`${BASE}/lines/${lineSlug}`)).status === 200)
+  check('it appears in the menu', home.includes(lineLink))
+  check('it appears among the signature lines on the home page', home.includes(lineName))
+  check('it appears in the sitemap', (await text('/sitemap.xml')).includes(`/lines/${lineSlug}`))
+  check('the old lines are still in the menu', ['mantra', 'kafka', 'valkrie'].every((slug) => home.includes(`href="/lines/${slug}"`)))
+
+  // A second line with the same name would reuse the address: refuse it.
+  await page.goto(`${BASE}/admin/dashboard/lines/new`)
+  await page.getByLabel('Nama line').fill(lineName)
+  await page.getByRole('button', { name: 'Buat line' }).click()
+  await page.getByText('Slug sudah dipakai').waitFor({ timeout: 10000 })
+  check('a duplicate address is refused', true)
+
+  // Moving it up changes the order the public pages use.
+  await page.goto(`${BASE}/admin/dashboard/lines`)
+  const row = page.locator('tr', { hasText: lineName })
+  await row.getByRole('button', { name: /Naik/ }).click()
+  await page.getByText('Urutan diubah.').waitFor({ timeout: 10000 })
+  const { data: afterMove } = await service.from('signature_lines').select('id, sort_order').order('sort_order')
+  const order = (afterMove ?? []).map((l) => l.id)
+  check('moving a line up changes its place in the order', order.indexOf(lineId) === order.length - 2)
+  check('the order stays numbered 1..n', (afterMove ?? []).every((l, i) => l.sort_order === i + 1))
+  const menuAfter = await text('/')
+  check('the menu follows the new order', menuAfter.indexOf(lineLink) < menuAfter.indexOf('href="/lines/valkrie"'))
+
+  // A line that still has a gecko cannot be deleted.
+  const { data: lineGecko } = await service
+    .from('geckos')
+    .insert({ code: `E2E-LN${String(stamp).slice(-4)}`, slug: `e2e-line-gecko-${String(stamp).slice(-6)}`, name: `E2E Line Gecko ${String(stamp).slice(-6)}`, line_id: lineId })
+    .select('id')
+    .single()
+  await page.goto(`${BASE}/admin/dashboard/lines/${lineId}`)
+  await page.getByRole('button', { name: 'Hapus line' }).click()
+  await page.getByText('masih dipakai 1 gecko').waitFor({ timeout: 10000 })
+  const { data: still } = await service.from('signature_lines').select('id').eq('id', lineId)
+  check('a line that still has geckos is not deleted', still?.length === 1)
+  const { data: keep } = await service.from('geckos').select('line_id').eq('id', lineGecko.id).single()
+  check('and its gecko keeps the line', keep.line_id === lineId)
+
+  // Once empty it can go, and it disappears everywhere.
+  await service.from('geckos').delete().eq('id', lineGecko.id)
+  await page.goto(`${BASE}/admin/dashboard/lines/${lineId}`)
+  await page.getByRole('button', { name: 'Hapus line' }).click()
+  await page.waitForURL('**/admin/dashboard/lines?deleted=1')
+  const { data: lineGone } = await service.from('signature_lines').select('id').eq('id', lineId)
+  check('an empty line can be deleted', lineGone?.length === 0)
+  // A cached page can be served once more while it refreshes, so allow a few seconds.
+  const statuses = []
+  for (let i = 0; i < 6 && statuses.at(-1) !== 404; i++) {
+    if (i) await new Promise((r) => setTimeout(r, 1500))
+    statuses.push((await fetch(`${BASE}/lines/${lineSlug}`)).status)
+  }
+  const goneStatus = statuses.at(-1)
+  const goneInMenu = !(await text('/')).includes(lineLink)
+  const goneInSitemap = !(await text('/sitemap.xml')).includes(`/lines/${lineSlug}`)
+  check('its page, menu entry and sitemap entry are gone', goneStatus === 404 && goneInMenu && goneInSitemap, JSON.stringify({ pageStatuses: statuses, menuClean: goneInMenu, sitemapClean: goneInSitemap }))
+  const { data: afterDelete } = await service.from('signature_lines').select('slug').order('sort_order')
+  check('the three original lines are untouched', ['mantra', 'kafka', 'valkrie'].every((slug) => (afterDelete ?? []).some((l) => l.slug === slug)))
+
   await page.getByRole('button', { name: 'Keluar' }).click()
   await page.waitForURL(/\/admin\?reason=signedout/)
   await page.goto(`${BASE}/admin/dashboard`)
@@ -291,6 +381,7 @@ try {
     if (objects?.length) await service.storage.from('media').remove(objects.map((o) => `geckos/${g.id}/${o.name}`))
     await service.from('geckos').delete().eq('id', g.id)
   }
+  await service.from('signature_lines').delete().like('slug', 'e2e-%')
   for (const id of users) await service.auth.admin.deleteUser(id)
   await browser.close()
 }

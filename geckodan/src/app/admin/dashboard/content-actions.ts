@@ -13,6 +13,7 @@ import {
   formObject,
   heroSchema,
   lineSchema,
+  newLineSchema,
   seoSchema,
   shippingSchema,
   socialsSchema,
@@ -32,6 +33,72 @@ export async function saveLine(id: string, formData: FormData): Promise<ActionSt
   if (error) return errorState(dbMessage(error))
   revalidateSite()
   return okState('Line disimpan.')
+}
+
+export async function createLine(formData: FormData): Promise<ActionState> {
+  const { supabase } = await requireAdmin()
+  const parsed = newLineSchema.safeParse(formObject(formData))
+  if (!parsed.success) return errorState(firstError(parsed.error))
+  const { data: last } = await supabase
+    .from('signature_lines')
+    .select('sort_order')
+    .order('sort_order', { ascending: false })
+    .limit(1)
+    .maybeSingle()
+  // A new line goes to the end and stays a draft until the owner publishes it.
+  const { data, error } = await supabase
+    .from('signature_lines')
+    .insert({ ...parsed.data, sort_order: (last?.sort_order ?? 0) + 1, published: false })
+    .select('id')
+    .single()
+  if (error) return errorState(dbMessage(error))
+  revalidateSite()
+  redirect(`/admin/dashboard/lines/${data.id}?created=1`)
+}
+
+export async function moveLine(id: string, direction: 'up' | 'down'): Promise<ActionState> {
+  const { supabase } = await requireAdmin()
+  uuid.parse(id)
+  const { data, error } = await supabase
+    .from('signature_lines')
+    .select('id, sort_order')
+    .order('sort_order', { ascending: true })
+    .order('created_at', { ascending: true })
+  if (error) return errorState(dbMessage(error))
+  const lines = data ?? []
+  const from = lines.findIndex((l) => l.id === id)
+  const to = direction === 'up' ? from - 1 : from + 1
+  if (from < 0) return errorState('Line tidak ditemukan.')
+  if (to < 0 || to >= lines.length) return okState('Sudah di posisi paling ' + (direction === 'up' ? 'atas.' : 'bawah.'))
+  const order = lines.map((l) => l.id)
+  ;[order[from], order[to]] = [order[to], order[from]]
+  // Renumber 1..n so the order stays clean even if two lines once shared a number.
+  for (const [i, lineId] of order.entries()) {
+    const current = lines.find((l) => l.id === lineId)
+    if (current?.sort_order === i + 1) continue
+    const res = await supabase.from('signature_lines').update({ sort_order: i + 1 }).eq('id', lineId)
+    if (res.error) return errorState(dbMessage(res.error))
+  }
+  revalidateSite()
+  return okState('Urutan diubah.')
+}
+
+export async function deleteLine(id: string): Promise<ActionState> {
+  const { supabase } = await requireAdmin()
+  uuid.parse(id)
+  const { count, error: countError } = await supabase
+    .from('geckos')
+    .select('id', { count: 'exact', head: true })
+    .eq('line_id', id)
+  if (countError) return errorState(dbMessage(countError))
+  // Deleting would silently detach these geckos from their line, so refuse instead.
+  if (count) return errorState(`Line ini masih dipakai ${count} gecko. Pindahkan geckonya ke line lain, atau matikan Tayang untuk menyembunyikan line.`)
+  const { data: line } = await supabase.from('signature_lines').select('cover_photo_path').eq('id', id).maybeSingle()
+  const { error } = await supabase.from('signature_lines').delete().eq('id', id)
+  if (error) return errorState(dbMessage(error))
+  await removeImages(supabase, [line?.cover_photo_path as string | null])
+  revalidateSite()
+  redirect('/admin/dashboard/lines?deleted=1')
 }
 
 export async function attachLineCover(id: string, path: string, alt: string): Promise<ActionState> {
