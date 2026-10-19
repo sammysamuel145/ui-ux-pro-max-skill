@@ -223,11 +223,6 @@
   gap: clamp(2rem, 4vw, 3.5rem) clamp(1rem, 2.4vw, 2.25rem);
 }
 
-/* A gentle stagger keeps the grid from reading as a table. */
-.gecko:nth-child(3n + 2) {
-  margin-top: clamp(1.5rem, 4vw, 3.5rem);
-}
-
 .gecko__photo {
   position: relative;
   display: block;
@@ -294,6 +289,55 @@
   max-width: 44ch;
 }
 
+/* ---------- Link to the full catalog ---------- */
+
+.catalog__all {
+  display: flex;
+  justify-content: center;
+  margin-top: clamp(2.5rem, 5vw, 4rem);
+}
+
+.arrow-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 1rem;
+  min-height: 56px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--on-night);
+  transition: transform 160ms var(--ease-out);
+}
+
+.arrow-cta__circle {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--rust);
+  color: #fff;
+  transition: transform 200ms var(--ease-out), background-color 160ms ease;
+}
+
+.arrow-cta__circle .arrow {
+  width: 22px;
+  height: 14px;
+}
+
+.arrow-cta:active {
+  transform: scale(0.97);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .arrow-cta:hover .arrow-cta__circle {
+    background: var(--rust-deep);
+    transform: translateX(4px);
+  }
+}
+
 /* ---------- Signature lines: a typographic index ---------- */
 
 .lines {
@@ -323,15 +367,15 @@
 }
 
 .line-index__row {
-  padding-block: clamp(0.5rem, 1.5vw, 1rem);
+  padding-block: clamp(1rem, 2.6vw, 2.25rem);
 }
 
 .line-index__row:nth-child(2) {
-  padding-left: clamp(0rem, 6vw, 5rem);
+  padding-left: clamp(0rem, 4vw, 3.5rem);
 }
 
 .line-index__row:nth-child(3) {
-  padding-left: clamp(0rem, 12vw, 10rem);
+  padding-left: clamp(0rem, 8vw, 7rem);
 }
 
 .line-index__name {
@@ -341,9 +385,9 @@
   background: none;
   text-align: left;
   font-family: var(--font-display);
-  font-size: clamp(3rem, 1rem + 7.4vw, 7.5rem);
-  line-height: 0.98;
-  letter-spacing: 0.02em;
+  font-size: clamp(2.75rem, 1rem + 6vw, 6.5rem);
+  line-height: 1;
+  letter-spacing: 0.16em;
   color: rgba(244, 244, 240, 0.55);
   cursor: pointer;
   transition: color 200ms ease-out;
@@ -787,12 +831,6 @@
   .catalog__grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-  .gecko:nth-child(3n + 2) {
-    margin-top: 0;
-  }
-  .gecko:nth-child(even) {
-    margin-top: clamp(1.5rem, 5vw, 3rem);
-  }
   .story__grid,
   .info__grid {
     grid-template-columns: 1fr;
@@ -831,9 +869,6 @@
 @media (max-width: 700px) {
   .catalog__grid {
     grid-template-columns: 1fr;
-  }
-  .gecko:nth-child(even) {
-    margin-top: 0;
   }
   .catalog__empty {
     grid-template-columns: 1fr;

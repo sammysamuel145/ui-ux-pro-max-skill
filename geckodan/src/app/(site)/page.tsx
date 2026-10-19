@@ -124,6 +124,7 @@ export default async function HomePage() {
                 </p>
               </div>
             ) : (
+              <>
               <ul className="catalog__grid">
                 {featured.data.map((g) => {
                   const href = `/geckos/${g.slug}`
@@ -154,6 +155,15 @@ export default async function HomePage() {
                   )
                 })}
               </ul>
+                <div className="catalog__all">
+                  <Link href="/geckos" className="arrow-cta" aria-label="See every gecko in the full catalog">
+                    <span>See every gecko</span>
+                    <span className="arrow-cta__circle" aria-hidden="true">
+                      <ArrowIcon />
+                    </span>
+                  </Link>
+                </div>
+              </>
             )}
           </div>
         </section>
