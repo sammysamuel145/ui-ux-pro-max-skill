@@ -33,8 +33,7 @@ function isCurrent(pathname: string, href: string) {
 }
 
 export function SiteHeader({ whatsappNumber }: { whatsappNumber: string }) {
-  const pathname = usePathname() ?? '/'
-  const overlay = pathname === '/'
+  const pathname = usePathname() || '/'
   const menuRef = useRef<HTMLDivElement>(null)
   const [open, setOpen] = useState(false)
 
@@ -63,7 +62,7 @@ export function SiteHeader({ whatsappNumber }: { whatsappNumber: string }) {
   }, [open])
 
   return (
-    <header className={`site-header${overlay ? ' is-overlay on-night' : ''}`}>
+    <header className="site-header">
       <div className="wrap site-header__bar">
         <Link href="/" className="brand-link" aria-label="GeckoDan, home">
           <Image src="/brand/geckodan-logo-256.png" alt="" width={256} height={242} preload />
