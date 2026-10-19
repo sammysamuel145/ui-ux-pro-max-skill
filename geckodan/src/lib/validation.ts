@@ -75,6 +75,7 @@ export const geckoSchema = z
   .refine((g) => /^[a-z0-9]+(-[a-z0-9]+)*$/.test(g.slug), { message: 'Slug tidak valid', path: ['slug'] })
 
 export const lineSchema = z.object({
+  name: requiredText(80, 'Nama'),
   tagline: optionalText(200),
   description: optionalText(8000),
   cover_photo_alt: optionalText(300),

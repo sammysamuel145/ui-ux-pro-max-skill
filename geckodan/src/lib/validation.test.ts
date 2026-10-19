@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { awardSchema, businessSchema, geckoSchema, heroSchema, newLineSchema, socialsSchema } from './validation'
+import { awardSchema, businessSchema, geckoSchema, heroSchema, lineSchema, newLineSchema, socialsSchema } from './validation'
 
 const gecko = {
   name: 'Test Gecko',
@@ -95,5 +95,13 @@ describe('settings schemas', () => {
     expect(newLineSchema.safeParse({ name: '   ', slug: '' }).success).toBe(false)
     expect(newLineSchema.safeParse({ name: '!!!', slug: '' }).success).toBe(false)
     expect(newLineSchema.safeParse({ name: 'x'.repeat(81), slug: '' }).success).toBe(false)
+  })
+
+  it('lets a line be renamed but not left without a name', () => {
+    const edit = { name: 'ORION PRIME', tagline: '', description: '', cover_photo_alt: '', seo_title: '', seo_description: '' }
+    expect(lineSchema.parse(edit).name).toBe('ORION PRIME')
+    expect(lineSchema.parse({ ...edit, name: '  Nova  ' }).name).toBe('Nova')
+    expect(lineSchema.safeParse({ ...edit, name: '   ' }).success).toBe(false)
+    expect(lineSchema.safeParse({ ...edit, name: 'x'.repeat(81) }).success).toBe(false)
   })
 })

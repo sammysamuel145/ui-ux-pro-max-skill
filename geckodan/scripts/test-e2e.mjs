@@ -307,6 +307,24 @@ try {
   check('it appears in the sitemap', (await text('/sitemap.xml')).includes(`/lines/${lineSlug}`))
   check('the old lines are still in the menu', ['mantra', 'kafka', 'valkrie'].every((slug) => home.includes(`href="/lines/${slug}"`)))
 
+  // Renaming changes the name shown everywhere, never the address.
+  const renamed = `${lineName} Prime`
+  await page.goto(`${BASE}/admin/dashboard/lines/${lineId}`)
+  await page.getByLabel('Nama line').fill('')
+  await page.getByLabel('Nama line').evaluate((el) => el.removeAttribute('required'))
+  await page.getByRole('button', { name: 'Simpan line' }).click()
+  await page.getByText('Nama wajib diisi').waitFor({ timeout: 10000 })
+  const { data: unchanged } = await service.from('signature_lines').select('name').eq('id', lineId).single()
+  check('a line cannot be saved without a name', unchanged.name === lineName)
+  await page.getByLabel('Nama line').fill(renamed)
+  await page.getByRole('button', { name: 'Simpan line' }).click()
+  await page.getByText('Line disimpan.').waitFor({ timeout: 10000 })
+  const { data: renamedRow } = await service.from('signature_lines').select('name, slug, published').eq('id', lineId).single()
+  check('a line can be renamed without changing its address', renamedRow.name === renamed && renamedRow.slug === lineSlug && renamedRow.published === true, JSON.stringify(renamedRow))
+  const homeRenamed = await text('/')
+  check('the new name shows in the menu and on the home page', homeRenamed.includes(renamed) && homeRenamed.includes(lineLink))
+  check('the old address still works and shows the new name', (await fetch(`${BASE}/lines/${lineSlug}`)).status === 200 && (await text(`/lines/${lineSlug}`)).includes(renamed))
+
   // A second line with the same name would reuse the address: refuse it.
   await page.goto(`${BASE}/admin/dashboard/lines/new`)
   await page.getByLabel('Nama line').fill(lineName)
@@ -316,7 +334,7 @@ try {
 
   // Moving it up changes the order the public pages use.
   await page.goto(`${BASE}/admin/dashboard/lines`)
-  const row = page.locator('tr', { hasText: lineName })
+  const row = page.locator('tr', { hasText: renamed })
   await row.getByRole('button', { name: /Naik/ }).click()
   await page.getByText('Urutan diubah.').waitFor({ timeout: 10000 })
   const { data: afterMove } = await service.from('signature_lines').select('id, sort_order').order('sort_order')

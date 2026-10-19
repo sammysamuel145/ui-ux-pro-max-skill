@@ -67,6 +67,11 @@ export default async function EditLinePage({ params, searchParams }: Props) {
           <fieldset>
             <legend>Cerita line</legend>
             <div className="field">
+              <label htmlFor="name">Nama line</label>
+              <input id="name" name="name" required maxLength={80} defaultValue={line.name} />
+              <p className="hint">Mengganti nama tidak mengubah alamat halaman (/lines/{line.slug}), jadi link lama tetap jalan.</p>
+            </div>
+            <div className="field">
               <label htmlFor="tagline">Tagline</label>
               <input id="tagline" name="tagline" maxLength={200} defaultValue={line.tagline ?? ''} />
             </div>
