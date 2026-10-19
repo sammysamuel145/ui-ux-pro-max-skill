@@ -2,18 +2,19 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { ActionForm, SubmitButton } from '@/components/admin/ActionForm'
 import { GeckoForm } from '@/components/admin/GeckoForm'
+import { AdminImage } from '@/components/admin/AdminImage'
 import { PhotoUploader } from '@/components/admin/PhotoUploader'
 import { requireAdmin } from '@/lib/admin'
 import { mediaUrl } from '@/lib/media'
 import type { Gecko, GeckoPhoto } from '@/lib/types'
 import {
+  attachPhoto,
   deleteGecko,
   deletePhoto,
   saveGecko,
   setArchived,
   setCoverPhoto,
   updatePhoto,
-  uploadPhotos,
 } from '../actions'
 
 type Props = {
@@ -67,7 +68,7 @@ export default async function EditGeckoPage({ params, searchParams }: Props) {
               const src = mediaUrl(p.storage_path)
               return (
                 <li key={p.id} className="photo-card">
-                  {src ? <img src={src} alt={p.alt} loading="lazy" /> : null}
+                  {src ? <AdminImage src={src} alt={p.alt} /> : null}
                   {p.is_cover ? <span className="tag">Sampul</span> : null}
                   <ActionForm action={updatePhoto.bind(null, p.id)} className="photo-card__form" label="Ubah foto">
                     <div className="field">
@@ -101,7 +102,7 @@ export default async function EditGeckoPage({ params, searchParams }: Props) {
         ) : (
           <p className="soft">Belum ada foto. Situs menampilkan pelat &ldquo;Foto menyusul&rdquo; sampai foto asli diunggah.</p>
         )}
-        <PhotoUploader action={uploadPhotos.bind(null, gecko.id)} />
+        <PhotoUploader folder={`geckos/${gecko.id}`} attach={attachPhoto.bind(null, gecko.id)} />
       </section>
 
       <section aria-labelledby="data-title" className="admin-section">

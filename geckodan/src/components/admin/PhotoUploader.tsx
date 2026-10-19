@@ -3,21 +3,27 @@
 import { useRouter } from 'next/navigation'
 import { useRef, useState, useTransition } from 'react'
 import type { ActionState } from '@/lib/action-state'
+import { MAX_IMAGE_MB } from '@/lib/media'
+import { browserClient } from '@/lib/supabase/browser'
+import { checkImageFile } from '@/lib/uploads'
 
 type Props = {
-  action: (formData: FormData) => Promise<ActionState>
-  /** Field name the action reads the file from. */
-  field?: string
+  /** Storage folder the photos go into, for example `geckos/<id>`. */
+  folder: string
+  /** Server action that verifies the stored file and records it. */
+  attach: (path: string, alt: string) => Promise<ActionState>
   multiple?: boolean
   label?: string
   withAlt?: boolean
 }
 
 /**
- * Sends one file per request, so each upload stays under the Server Action
- * body limit no matter how many photos are selected.
+ * Uploads each photo straight from the browser to Storage, as the signed-in
+ * admin (Storage policies still decide who may write), then asks the server
+ * to verify and record it. Photos never pass through the app server, so the
+ * only size limit is the 25 MB the dashboard allows.
  */
-export function PhotoUploader({ action, field = 'photos', multiple = true, label = 'Pilih foto', withAlt = true }: Props) {
+export function PhotoUploader({ folder, attach, multiple = true, label = 'Pilih foto', withAlt = true }: Props) {
   const router = useRouter()
   const inputRef = useRef<HTMLInputElement>(null)
   const altRef = useRef<HTMLInputElement>(null)
@@ -31,23 +37,42 @@ export function PhotoUploader({ action, field = 'photos', multiple = true, label
       setMessages([{ ok: false, text: 'Pilih minimal satu foto.' }])
       return
     }
+    const client = browserClient()
+    if (!client) {
+      setMessages([{ ok: false, text: 'Supabase belum dikonfigurasi.' }])
+      return
+    }
     const alt = altRef.current?.value ?? ''
     startTransition(async () => {
       const results: Array<{ ok: boolean; text: string }> = []
+      let saved = 0
       for (const [i, file] of files.entries()) {
-        setProgress(`Mengunggah ${i + 1} dari ${files.length}…`)
-        const data = new FormData()
-        data.append(field, file)
-        data.append('alt', alt)
+        setProgress(`Mengunggah ${i + 1} dari ${files.length}: ${file.name}…`)
+        const checked = await checkImageFile(file)
+        if (typeof checked === 'string') {
+          results.push({ ok: false, text: checked })
+          continue
+        }
+        const path = `${folder}/${crypto.randomUUID()}.${checked.ext}`
+        const { error } = await client.storage.from('media').upload(path, file, {
+          contentType: checked.contentType,
+          cacheControl: '31536000',
+          upsert: false,
+        })
+        if (error) {
+          console.error('[geckodan] upload', error.message)
+          results.push({ ok: false, text: `${file.name}: upload gagal. Masuk ulang lalu coba lagi.` })
+          continue
+        }
         try {
-          const result = await action(data)
+          const result = await attach(path, alt)
           if (result && !result.ok) results.push({ ok: false, text: `${file.name}: ${result.message}` })
+          else saved++
         } catch {
-          results.push({ ok: false, text: `${file.name}: upload gagal (file mungkin terlalu besar).` })
+          results.push({ ok: false, text: `${file.name}: gagal disimpan. Coba lagi.` })
         }
       }
-      const failed = results.length
-      if (failed < files.length) results.unshift({ ok: true, text: `${files.length - failed} file tersimpan.` })
+      if (saved) results.unshift({ ok: true, text: `${saved} file tersimpan.` })
       setMessages(results)
       setProgress(null)
       if (inputRef.current) inputRef.current.value = ''
@@ -55,7 +80,7 @@ export function PhotoUploader({ action, field = 'photos', multiple = true, label
     })
   }
 
-  const id = `upload-${field}`
+  const id = `upload-${folder.replace(/[^a-z0-9]+/gi, '-')}`
   return (
     <div className="uploader">
       <div className="field">
@@ -68,7 +93,7 @@ export function PhotoUploader({ action, field = 'photos', multiple = true, label
           multiple={multiple}
           disabled={pending}
         />
-        <p className="hint">JPG, PNG, WebP, atau AVIF. Maksimal 8 MB per file. Gunakan foto asli saja.</p>
+        <p className="hint">JPG, PNG, WebP, atau AVIF. Maksimal {MAX_IMAGE_MB} MB per file. Gunakan foto asli saja.</p>
       </div>
       {withAlt ? (
         <div className="field">

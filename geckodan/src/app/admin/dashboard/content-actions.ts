@@ -4,8 +4,7 @@ import { redirect } from 'next/navigation'
 import { z } from 'zod'
 import { errorState, okState, type ActionState } from '@/lib/action-state'
 import { requireAdmin } from '@/lib/admin'
-import { dbMessage, removeImages, revalidateSite, uploadImage } from '@/lib/admin-helpers'
-import { filesFrom } from '@/lib/uploads'
+import { dbMessage, removeImages, revalidateSite, verifyStoredImage } from '@/lib/admin-helpers'
 import {
   awardSchema,
   businessSchema,
@@ -35,22 +34,23 @@ export async function saveLine(id: string, formData: FormData): Promise<ActionSt
   return okState('Line disimpan.')
 }
 
-export async function uploadLineCover(id: string, formData: FormData): Promise<ActionState> {
+export async function attachLineCover(id: string, path: string, alt: string): Promise<ActionState> {
   const { supabase } = await requireAdmin()
   uuid.parse(id)
-  const [file] = filesFrom(formData, 'cover')
-  if (!file) return errorState('Pilih satu foto.')
-  const { data: line } = await supabase.from('signature_lines').select('cover_photo_path, name').eq('id', id).maybeSingle()
-  if (!line) return errorState('Line tidak ditemukan.')
-  const result = await uploadImage(supabase, file, `lines/${id}`)
-  if ('error' in result) return errorState(result.error)
-  const alt = String(formData.get('alt') ?? '').trim().slice(0, 300)
+  const problem = await verifyStoredImage(supabase, path, `lines/${id}/`)
+  if (problem) return errorState(problem)
+  const { data: line } = await supabase.from('signature_lines').select('cover_photo_path').eq('id', id).maybeSingle()
+  if (!line) {
+    await removeImages(supabase, [path])
+    return errorState('Line tidak ditemukan.')
+  }
+  const cleanAlt = String(alt ?? '').trim().slice(0, 300)
   const { error } = await supabase
     .from('signature_lines')
-    .update({ cover_photo_path: result.path, ...(alt ? { cover_photo_alt: alt } : {}) })
+    .update({ cover_photo_path: path, ...(cleanAlt ? { cover_photo_alt: cleanAlt } : {}) })
     .eq('id', id)
   if (error) {
-    await removeImages(supabase, [result.path])
+    await removeImages(supabase, [path])
     return errorState(dbMessage(error))
   }
   await removeImages(supabase, [line.cover_photo_path as string | null])
@@ -96,18 +96,19 @@ export async function saveAward(id: string | null, formData: FormData): Promise<
   redirect(`/admin/dashboard/awards/${data.id}?created=1`)
 }
 
-export async function uploadAwardEvidence(id: string, formData: FormData): Promise<ActionState> {
+export async function attachAwardEvidence(id: string, path: string): Promise<ActionState> {
   const { supabase } = await requireAdmin()
   uuid.parse(id)
-  const [file] = filesFrom(formData, 'evidence')
-  if (!file) return errorState('Pilih satu gambar bukti.')
+  const problem = await verifyStoredImage(supabase, path, `awards/${id}/`)
+  if (problem) return errorState(problem)
   const { data: award } = await supabase.from('awards').select('evidence_path').eq('id', id).maybeSingle()
-  if (!award) return errorState('Prestasi tidak ditemukan.')
-  const result = await uploadImage(supabase, file, `awards/${id}`)
-  if ('error' in result) return errorState(result.error)
-  const { error } = await supabase.from('awards').update({ evidence_path: result.path }).eq('id', id)
+  if (!award) {
+    await removeImages(supabase, [path])
+    return errorState('Prestasi tidak ditemukan.')
+  }
+  const { error } = await supabase.from('awards').update({ evidence_path: path }).eq('id', id)
   if (error) {
-    await removeImages(supabase, [result.path])
+    await removeImages(supabase, [path])
     return errorState(dbMessage(error))
   }
   await removeImages(supabase, [award.evidence_path as string | null])
@@ -216,30 +217,62 @@ export async function saveSetting(key: SettingKey, formData: FormData): Promise<
   return mergeSetting(supabase, key, parsed.data as Record<string, unknown>)
 }
 
-export async function uploadHeroImage(formData: FormData): Promise<ActionState> {
+// ---------------------------------------------------------------- site-wide pictures
+
+type SiteImage = { setting: SettingKey; field: string; folder: string; altField?: string; done: string }
+
+const SITE_IMAGES = {
+  hero: { setting: 'hero', field: 'image_path', altField: 'image_alt', folder: 'site/hero/', done: 'Gambar hero diganti.' },
+  story: { setting: 'story', field: 'image_path', altField: 'image_alt', folder: 'site/story/', done: 'Foto Our Story diganti.' },
+  og: { setting: 'seo', field: 'og_image_path', folder: 'site/og/', done: 'Gambar share diganti.' },
+} satisfies Record<string, SiteImage>
+
+async function attachSiteImage(kind: keyof typeof SITE_IMAGES, path: string, alt: string): Promise<ActionState> {
   const { supabase } = await requireAdmin()
-  const [file] = filesFrom(formData, 'hero')
-  if (!file) return errorState('Pilih satu gambar.')
-  const { data: current } = await supabase.from('site_settings').select('value').eq('key', 'hero').maybeSingle()
-  const oldPath = (current?.value as { image_path?: string } | undefined)?.image_path
-  const result = await uploadImage(supabase, file, 'site/hero')
-  if ('error' in result) return errorState(result.error)
-  const alt = String(formData.get('alt') ?? '').trim().slice(0, 300)
+  const cfg: SiteImage = SITE_IMAGES[kind]
+  const problem = await verifyStoredImage(supabase, path, cfg.folder)
+  if (problem) return errorState(problem)
+  const { data: current } = await supabase.from('site_settings').select('value').eq('key', cfg.setting).maybeSingle()
+  const oldPath = (current?.value as Record<string, string> | undefined)?.[cfg.field]
+  const cleanAlt = String(alt ?? '').trim().slice(0, 300)
+  const patch: Record<string, unknown> = { [cfg.field]: path }
   // A newly uploaded hero is the owner's own photo, not the concept illustration.
-  const state = await mergeSetting(supabase, 'hero', { image_path: result.path, image_is_concept: false, ...(alt ? { image_alt: alt } : {}) })
+  if (kind === 'hero') patch.image_is_concept = false
+  if (cfg.altField && cleanAlt) patch[cfg.altField] = cleanAlt
+  const state = await mergeSetting(supabase, cfg.setting, patch)
   if (!state?.ok) {
-    await removeImages(supabase, [result.path])
+    await removeImages(supabase, [path])
     return state
   }
   if (oldPath) await removeImages(supabase, [oldPath])
-  return okState('Gambar hero diganti.')
+  return okState(cfg.done)
 }
 
-export async function removeHeroImage(): Promise<ActionState> {
+async function clearSiteImage(kind: keyof typeof SITE_IMAGES, extra: Record<string, unknown>, message: string): Promise<ActionState> {
   const { supabase } = await requireAdmin()
-  const { data: current } = await supabase.from('site_settings').select('value').eq('key', 'hero').maybeSingle()
-  const oldPath = (current?.value as { image_path?: string } | undefined)?.image_path
-  const state = await mergeSetting(supabase, 'hero', { image_path: '', image_is_concept: true })
+  const cfg: SiteImage = SITE_IMAGES[kind]
+  const { data: current } = await supabase.from('site_settings').select('value').eq('key', cfg.setting).maybeSingle()
+  const oldPath = (current?.value as Record<string, string> | undefined)?.[cfg.field]
+  const state = await mergeSetting(supabase, cfg.setting, { [cfg.field]: '', ...extra })
   if (state?.ok && oldPath) await removeImages(supabase, [oldPath])
-  return state?.ok ? okState('Hero kembali memakai ilustrasi konsep.') : state
+  return state?.ok ? okState(message) : state
+}
+
+export async function attachHeroImage(path: string, alt: string) {
+  return attachSiteImage('hero', path, alt)
+}
+export async function attachStoryImage(path: string, alt: string) {
+  return attachSiteImage('story', path, alt)
+}
+export async function attachOgImage(path: string) {
+  return attachSiteImage('og', path, '')
+}
+export async function removeHeroImage() {
+  return clearSiteImage('hero', { image_is_concept: true }, 'Hero kembali memakai ilustrasi konsep.')
+}
+export async function removeStoryImage() {
+  return clearSiteImage('story', {}, 'Foto Our Story dihapus.')
+}
+export async function removeOgImage() {
+  return clearSiteImage('og', {}, 'Gambar share dihapus. Situs memakai logo GeckoDan.')
 }

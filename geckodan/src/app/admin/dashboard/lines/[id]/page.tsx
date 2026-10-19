@@ -1,11 +1,12 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { ActionForm, SubmitButton } from '@/components/admin/ActionForm'
+import { AdminImage } from '@/components/admin/AdminImage'
 import { PhotoUploader } from '@/components/admin/PhotoUploader'
 import { requireAdmin } from '@/lib/admin'
 import { mediaUrl } from '@/lib/media'
 import type { SignatureLine } from '@/lib/types'
-import { removeLineCover, saveLine, uploadLineCover } from '../../content-actions'
+import { attachLineCover, removeLineCover, saveLine } from '../../content-actions'
 
 export default async function EditLinePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -34,7 +35,7 @@ export default async function EditLinePage({ params }: { params: Promise<{ id: s
         <h2 id="cover-title">Foto sampul</h2>
         {cover ? (
           <div className="photo-card" style={{ maxWidth: 320 }}>
-            <img src={cover} alt={line.cover_photo_alt ?? ''} />
+            <AdminImage src={cover} alt={line.cover_photo_alt ?? ''} />
             <ActionForm action={removeLineCover.bind(null, line.id)} confirm="Hapus foto sampul line ini?" label="Hapus sampul">
               <SubmitButton small variant="btn-quiet">
                 Hapus sampul
@@ -44,7 +45,7 @@ export default async function EditLinePage({ params }: { params: Promise<{ id: s
         ) : (
           <p className="soft">Belum ada foto sampul. Situs menampilkan pelat logo sampai foto asli diunggah.</p>
         )}
-        <PhotoUploader action={uploadLineCover.bind(null, line.id)} field="cover" multiple={false} label="Ganti foto sampul" />
+        <PhotoUploader folder={`lines/${line.id}`} attach={attachLineCover.bind(null, line.id)} multiple={false} label="Ganti foto sampul" />
       </section>
 
       <section className="admin-section" aria-labelledby="text-title">

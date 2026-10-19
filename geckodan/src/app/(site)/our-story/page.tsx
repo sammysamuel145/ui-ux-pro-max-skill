@@ -1,7 +1,9 @@
 import type { Metadata } from 'next'
 import { PendingContent } from '@/components/Notices'
+import Image from 'next/image'
 import { PageHead } from '@/components/PageHead'
 import { getSettings } from '@/lib/data/public'
+import { mediaUrl } from '@/lib/media'
 import { paragraphs } from '@/lib/text'
 
 export const revalidate = 60
@@ -15,6 +17,7 @@ export const metadata: Metadata = {
 export default async function StoryPage() {
   const settings = await getSettings()
   const body = paragraphs(settings.story.body)
+  const photo = mediaUrl(settings.story.image_path)
   return (
     <>
       <PageHead
@@ -24,6 +27,11 @@ export default async function StoryPage() {
       />
       <section className="letter-band" aria-label="Story" style={{ paddingTop: 'clamp(16px, 3vw, 40px)' }}>
         <article className="letter reveal">
+          {photo ? (
+            <div className="letter__photo">
+              <Image src={photo} alt={settings.story.image_alt || 'GeckoDan breeder'} fill sizes="(max-width: 760px) 92vw, 680px" style={{ objectFit: 'cover' }} />
+            </div>
+          ) : null}
           <div className="prose">
             {body.length ? (
               body.map((p, i) => <p key={i}>{p}</p>)

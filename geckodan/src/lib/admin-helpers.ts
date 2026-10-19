@@ -1,7 +1,8 @@
 import 'server-only'
 import { revalidatePath } from 'next/cache'
 import type { SupabaseClient } from '@supabase/supabase-js'
-import { checkImage } from './uploads'
+import { mediaUrl, STORED_IMAGE_PATH } from './media'
+import { validateStoredImage } from './uploads'
 
 type DbError = { code?: string; message: string; details?: string | null }
 
@@ -30,25 +31,59 @@ export function revalidateSite() {
 }
 
 /**
- * Uploads one image to the media bucket as the signed-in admin, so Storage
- * policies apply. Returns the stored path or an error message.
+ * Checks an image the admin's browser has just stored in the media bucket. It
+ * reads only the first bytes (a Range request) to learn the real format, and
+ * takes the size from the response, so a 25 MB photo is never downloaded to
+ * the server. A file that fails is removed from the bucket. Returns a message
+ * when the file is not acceptable, or null when it is fine.
  */
-export async function uploadImage(
+export async function verifyStoredImage(
   supabase: SupabaseClient,
-  file: File,
-  folder: string,
-): Promise<{ path: string } | { error: string }> {
-  const checked = await checkImage(file)
-  if (typeof checked === 'string') return { error: checked }
-  const path = `${folder}/${crypto.randomUUID()}.${checked.ext}`
-  const { error } = await supabase.storage
-    .from('media')
-    .upload(path, checked.bytes, { contentType: checked.contentType, cacheControl: '31536000', upsert: false })
-  if (error) {
-    console.error('[geckodan:admin] upload', error.message)
-    return { error: 'Upload gagal. Coba lagi.' }
+  path: string,
+  expectedPrefix: string,
+): Promise<string | null> {
+  const fail = async (message: string) => {
+    if (STORED_IMAGE_PATH.test(path) && path.startsWith(expectedPrefix)) await removeImages(supabase, [path])
+    return message
   }
-  return { path }
+  if (!STORED_IMAGE_PATH.test(path) || !path.startsWith(expectedPrefix)) return 'Nama file tidak valid.'
+  const url = mediaUrl(path)
+  if (!url) return 'Penyimpanan belum dikonfigurasi.'
+
+  let res: Response
+  try {
+    res = await fetch(url, { headers: { Range: 'bytes=0-63' }, cache: 'no-store' })
+  } catch (error) {
+    console.error('[geckodan:admin] verify fetch', error)
+    return 'File tidak bisa diperiksa. Coba lagi.'
+  }
+  if (res.status !== 200 && res.status !== 206) return fail('File tidak ditemukan di penyimpanan.')
+
+  // A server that ignores Range answers 200 with the whole body: read only the start of it.
+  const reader = res.body?.getReader()
+  const chunks: Uint8Array[] = []
+  let got = 0
+  while (reader && got < 64) {
+    const { done, value } = await reader.read()
+    if (done || !value) break
+    chunks.push(value)
+    got += value.length
+  }
+  // Not awaited: inside Next's patched fetch a cancel can wait on the rest of the body.
+  reader?.cancel().catch(() => undefined)
+  const head = new Uint8Array(Math.min(got, 64))
+  let offset = 0
+  for (const chunk of chunks) {
+    const take = Math.min(chunk.length, head.length - offset)
+    head.set(chunk.subarray(0, take), offset)
+    offset += take
+    if (offset >= head.length) break
+  }
+
+  const range = res.headers.get('content-range')
+  const total = range?.includes('/') ? Number(range.split('/')[1]) : Number(res.headers.get('content-length'))
+  const problem = validateStoredImage({ path, expectedPrefix, head, totalBytes: Number.isFinite(total) ? total : null })
+  return problem ? fail(problem) : null
 }
 
 export async function removeImages(supabase: SupabaseClient, paths: Array<string | null | undefined>) {

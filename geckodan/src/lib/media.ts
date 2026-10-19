@@ -16,4 +16,13 @@ export const ALLOWED_IMAGE_TYPES: Record<string, string> = {
   'image/avif': 'avif',
 }
 
-export const MAX_IMAGE_BYTES = 8 * 1024 * 1024
+/** Largest single image the dashboard accepts. The bucket enforces the same limit. */
+export const MAX_IMAGE_MB = 25
+export const MAX_IMAGE_BYTES = MAX_IMAGE_MB * 1024 * 1024
+
+/**
+ * Every object name the app writes: <area>/<id>/<uuid>.<ext> for geckos, lines
+ * and awards, and site/<hero|story|og>/<uuid>.<ext> for site-wide pictures.
+ */
+export const STORED_IMAGE_PATH =
+  /^(?:(?:geckos|lines|awards)\/[0-9a-f-]{36}|site\/(?:hero|story|og))\/[0-9a-f-]{36}\.(?:jpg|png|webp|avif)$/

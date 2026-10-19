@@ -192,6 +192,20 @@ try {
       .from('media')
       .upload(`geckos/${publishedId}/${crypto.randomUUID()}.txt`, Buffer.from('x'), { contentType: 'text/plain' })
     check('the bucket rejects non-image files', !!e4)
+    // Large photos: the dashboard allows up to 25 MB, and the bucket enforces the same limit.
+    const header = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAAB', 'base64')
+    const big = Buffer.concat([header, Buffer.alloc(12 * 1024 * 1024)])
+    const bigPath = `geckos/${publishedId}/${crypto.randomUUID()}.png`
+    const { error: eBig } = await admin.storage.from('media').upload(bigPath, big, { contentType: 'image/png' })
+    created.objects.push(bigPath)
+    check('an admin can upload a 12 MB photo', !eBig, eBig?.message)
+    const huge = Buffer.concat([header, Buffer.alloc(26 * 1024 * 1024)])
+    const hugePath = `geckos/${publishedId}/${crypto.randomUUID()}.png`
+    const { error: eHuge } = await admin.storage.from('media').upload(hugePath, huge, { contentType: 'image/png' })
+    created.objects.push(hugePath)
+    check('the bucket rejects a file over 25 MB', !!eHuge)
+    const { error: eUserBig } = await user.storage.from('media').upload(`geckos/${publishedId}/${crypto.randomUUID()}.png`, big, { contentType: 'image/png' })
+    check('a non-admin still cannot upload a large file', !!eUserBig)
     const publicUrl = anon.storage.from('media').getPublicUrl(path).data.publicUrl
     const res = await fetch(publicUrl)
     check('an uploaded image is publicly readable by URL', res.ok, `HTTP ${res.status}`)

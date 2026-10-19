@@ -51,6 +51,7 @@ export default async function HomePage() {
   const wa = business.whatsapp_number
   const base = siteUrl()
   const storyParas = paragraphs(story.body)
+  const storyPhoto = mediaUrl(story.image_path)
   const firstTestimonial = testimonials.state === 'ok' ? testimonials.data[0] : undefined
   const readUrl = /^https:\/\//.test(business.google_reviews_url) ? business.google_reviews_url : ''
   const writeUrl = /^https:\/\//.test(business.google_write_review_url) ? business.google_write_review_url : ''
@@ -236,7 +237,11 @@ export default async function HomePage() {
             </div>
             <div className="story__side">
               <div className="story__photo rv">
-                <PhotoSlot label="GeckoDan breeder" />
+                {storyPhoto ? (
+                  <Image src={storyPhoto} alt={story.image_alt || 'GeckoDan breeder'} fill sizes="(max-width: 1000px) 92vw, 40vw" style={{ objectFit: 'cover' }} />
+                ) : (
+                  <PhotoSlot label="GeckoDan breeder" />
+                )}
               </div>
               <div className="achv">
                 <h3>Achievements</h3>

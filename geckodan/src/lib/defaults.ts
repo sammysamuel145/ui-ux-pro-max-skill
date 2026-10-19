@@ -31,7 +31,7 @@ export const DEFAULT_SETTINGS: SiteSettings = {
     image_alt: '',
     image_is_concept: true,
   },
-  story: { title: 'Our Story', body: '', signature: '' },
+  story: { title: 'Our Story', body: '', signature: '', image_path: '', image_alt: '' },
   shipping: { body: '' },
   seo: {
     site_title: 'GeckoDan',

@@ -357,7 +357,7 @@ values (
   'media',
   'media',
   true,
-  10485760,
+  26214400,
   array['image/jpeg', 'image/png', 'image/webp', 'image/avif']
 )
 on conflict (id) do update

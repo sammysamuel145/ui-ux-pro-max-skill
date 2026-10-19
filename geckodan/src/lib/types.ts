@@ -127,7 +127,7 @@ export type HeroSettings = {
   image_is_concept: boolean
 }
 
-export type StorySettings = { title: string; body: string; signature: string }
+export type StorySettings = { title: string; body: string; signature: string; image_path: string; image_alt: string }
 export type ShippingSettings = { body: string }
 export type SeoSettings = { site_title: string; default_description: string; og_image_path: string }
 

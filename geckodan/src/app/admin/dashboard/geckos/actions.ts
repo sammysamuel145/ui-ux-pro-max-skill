@@ -4,12 +4,10 @@ import { redirect } from 'next/navigation'
 import { z } from 'zod'
 import { errorState, okState, type ActionState } from '@/lib/action-state'
 import { requireAdmin } from '@/lib/admin'
-import { dbMessage, removeImages, revalidateSite, uploadImage } from '@/lib/admin-helpers'
-import { filesFrom } from '@/lib/uploads'
+import { dbMessage, removeImages, revalidateSite, verifyStoredImage } from '@/lib/admin-helpers'
 import { firstError, formObject, geckoSchema } from '@/lib/validation'
 
 const uuid = z.string().uuid()
-const MAX_FILES_PER_UPLOAD = 8
 
 function assertId(id: unknown): string {
   return uuid.parse(id)
@@ -55,46 +53,40 @@ export async function deleteGecko(id: string): Promise<ActionState> {
   redirect('/admin/dashboard/geckos?deleted=1')
 }
 
-export async function uploadPhotos(geckoId: string, formData: FormData): Promise<ActionState> {
+/**
+ * Records a photo the browser has already uploaded straight to Storage. The
+ * server first checks the stored file (real image type, size, expected folder)
+ * and removes it if it fails; only then is it added to the gecko.
+ */
+export async function attachPhoto(geckoId: string, path: string, alt: string): Promise<ActionState> {
   const { supabase } = await requireAdmin()
   assertId(geckoId)
-  const files = filesFrom(formData, 'photos')
-  if (!files.length) return errorState('Pilih minimal satu foto.')
-  if (files.length > MAX_FILES_PER_UPLOAD) return errorState(`Maksimal ${MAX_FILES_PER_UPLOAD} foto sekali upload.`)
-  const alt = String(formData.get('alt') ?? '').trim().slice(0, 300)
+  const problem = await verifyStoredImage(supabase, path, `geckos/${geckoId}/`)
+  if (problem) return errorState(problem)
 
   const { data: gecko } = await supabase.from('geckos').select('name').eq('id', geckoId).maybeSingle()
-  if (!gecko) return errorState('Gecko tidak ditemukan.')
+  if (!gecko) {
+    await removeImages(supabase, [path])
+    return errorState('Gecko tidak ditemukan.')
+  }
   const { data: existing } = await supabase.from('gecko_photos').select('sort_order, is_cover').eq('gecko_id', geckoId)
-  let nextOrder = Math.max(0, ...(existing ?? []).map((p) => (p.sort_order as number) + 1))
-  let needsCover = !(existing ?? []).some((p) => p.is_cover)
+  const nextOrder = Math.max(0, ...(existing ?? []).map((p) => (p.sort_order as number) + 1))
+  const needsCover = !(existing ?? []).some((p) => p.is_cover)
+  const cleanAlt = String(alt ?? '').trim().slice(0, 300)
 
-  const problems: string[] = []
-  let saved = 0
-  for (const file of files) {
-    const result = await uploadImage(supabase, file, `geckos/${geckoId}`)
-    if ('error' in result) {
-      problems.push(result.error)
-      continue
-    }
-    const { error } = await supabase.from('gecko_photos').insert({
-      gecko_id: geckoId,
-      storage_path: result.path,
-      alt: alt || `Foto ${gecko.name}`,
-      sort_order: nextOrder++,
-      is_cover: needsCover,
-    })
-    if (error) {
-      await removeImages(supabase, [result.path])
-      problems.push(dbMessage(error))
-      continue
-    }
-    needsCover = false
-    saved++
+  const { error } = await supabase.from('gecko_photos').insert({
+    gecko_id: geckoId,
+    storage_path: path,
+    alt: cleanAlt || `Foto ${gecko.name}`,
+    sort_order: nextOrder,
+    is_cover: needsCover,
+  })
+  if (error) {
+    await removeImages(supabase, [path])
+    return errorState(dbMessage(error))
   }
   revalidateSite()
-  if (problems.length) return errorState(`${saved} foto tersimpan. ${problems.join(' ')}`)
-  return okState(`${saved} foto tersimpan.`)
+  return okState('Foto tersimpan.')
 }
 
 export async function updatePhoto(photoId: string, formData: FormData): Promise<ActionState> {

@@ -167,6 +167,7 @@ export const storySchema = z.object({
   title: requiredText(80, 'Judul'),
   body: z.string().trim().max(12000),
   signature: z.string().trim().max(120),
+  image_alt: z.string().trim().max(300).optional(),
 })
 
 export const shippingSchema = z.object({ body: z.string().trim().max(12000) })

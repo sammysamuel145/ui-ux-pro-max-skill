@@ -2,11 +2,12 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { ActionForm, SubmitButton } from '@/components/admin/ActionForm'
 import { AwardForm } from '@/components/admin/AwardForm'
+import { AdminImage } from '@/components/admin/AdminImage'
 import { PhotoUploader } from '@/components/admin/PhotoUploader'
 import { requireAdmin } from '@/lib/admin'
 import { mediaUrl } from '@/lib/media'
 import type { Award } from '@/lib/types'
-import { deleteAward, saveAward, uploadAwardEvidence } from '../../content-actions'
+import { attachAwardEvidence, deleteAward, saveAward } from '../../content-actions'
 
 type Props = {
   params: Promise<{ id: string }>
@@ -41,15 +42,15 @@ export default async function EditAwardPage({ params, searchParams }: Props) {
         {evidence ? (
           <div className="photo-card" style={{ maxWidth: 320 }}>
             <a href={evidence} target="_blank" rel="noopener noreferrer">
-              <img src={evidence} alt={`Bukti ${award.title}`} />
+              <AdminImage src={evidence} alt={`Bukti ${award.title}`} />
             </a>
           </div>
         ) : (
           <p className="soft">Belum ada gambar bukti.</p>
         )}
         <PhotoUploader
-          action={uploadAwardEvidence.bind(null, award.id)}
-          field="evidence"
+          folder={`awards/${award.id}`}
+          attach={attachAwardEvidence.bind(null, award.id)}
           multiple={false}
           withAlt={false}
           label={evidence ? 'Ganti gambar bukti' : 'Unggah sertifikat atau foto piala'}

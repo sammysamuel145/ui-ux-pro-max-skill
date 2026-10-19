@@ -40,8 +40,16 @@ an owner-only admin dashboard.
   testimonials with customer permission.
 - The database itself refuses to publish an award without verification and
   evidence, or a testimonial without permission.
-- Uploads are limited to JPG, PNG, WebP and AVIF up to 8 MB. The server checks
-  the file's real bytes, and the bucket repeats the type and size limits.
+- Uploads are limited to JPG, PNG, WebP and AVIF up to 25 MB. Photos go from the
+  admin's browser straight to Supabase Storage (so hosts with small request
+  limits, such as Vercel's ~4.5 MB, do not matter) under the signed-in admin's
+  own session; the storage policies still allow only admins to write. A Server
+  Action then reads the first bytes of the stored file, checks that they are a
+  real image matching the file name, and only then records it. A file that
+  fails is deleted from the bucket. The bucket repeats the type and size limits.
+- The dashboard has upload controls for gecko photos, line covers, award
+  evidence, the hero photo, the Our Story photo and the social share (Open
+  Graph) image. Until a share image is uploaded, links use the GeckoDan logo.
 - The `media` bucket is public-read, so anyone with an image URL can open it.
   File names are random UUIDs, so unpublished photos cannot be guessed.
 

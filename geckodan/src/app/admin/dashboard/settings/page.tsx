@@ -1,10 +1,19 @@
 import { ActionForm, SubmitButton } from '@/components/admin/ActionForm'
+import { AdminImage } from '@/components/admin/AdminImage'
 import { PhotoUploader } from '@/components/admin/PhotoUploader'
 import { requireAdmin } from '@/lib/admin'
 import { DEFAULT_SETTINGS } from '@/lib/defaults'
 import { mediaUrl } from '@/lib/media'
 import type { SiteSettings } from '@/lib/types'
-import { removeHeroImage, saveSetting, uploadHeroImage } from '../content-actions'
+import {
+  attachHeroImage,
+  attachOgImage,
+  attachStoryImage,
+  removeHeroImage,
+  removeOgImage,
+  removeStoryImage,
+  saveSetting,
+} from '../content-actions'
 
 function Text({ id, label, value, hint, ...rest }: { id: string; label: string; value: string | number | null; hint?: string } & Omit<React.InputHTMLAttributes<HTMLInputElement>, 'value'>) {
   return (
@@ -35,6 +44,8 @@ export default async function AdminSettingsPage() {
   }
   const { business, socials, hero, story, shipping, seo } = s as unknown as SiteSettings
   const heroSrc = mediaUrl(hero.image_path)
+  const storySrc = mediaUrl(story.image_path)
+  const ogSrc = mediaUrl(seo.og_image_path)
 
   return (
     <div className="admin-stack">
@@ -103,7 +114,7 @@ export default async function AdminSettingsPage() {
         <h2 id="hero-image-title">Gambar hero</h2>
         {heroSrc ? (
           <div className="photo-card" style={{ maxWidth: 420 }}>
-            <img src={heroSrc} alt={hero.image_alt} />
+            <AdminImage src={heroSrc} alt={hero.image_alt} size={420} />
             <ActionForm action={removeHeroImage} confirm="Kembali ke ilustrasi konsep?" label="Hapus gambar hero">
               <SubmitButton small variant="btn-quiet">
                 Kembali ke ilustrasi konsep
@@ -113,7 +124,7 @@ export default async function AdminSettingsPage() {
         ) : (
           <p className="soft">Saat ini hero memakai ilustrasi konsep yang disetujui, dengan keterangan bahwa itu bukan foto hewan GeckoDan.</p>
         )}
-        <PhotoUploader action={uploadHeroImage} field="hero" multiple={false} label="Unggah foto hero asli" />
+        <PhotoUploader folder="site/hero" attach={attachHeroImage} multiple={false} label="Unggah foto hero asli" />
       </section>
 
       <ActionForm action={saveSetting.bind(null, 'hero')} className="admin-form" label="Teks hero">
@@ -138,12 +149,30 @@ export default async function AdminSettingsPage() {
         </div>
       </ActionForm>
 
+      <section className="admin-section" aria-labelledby="story-image-title">
+        <h2 id="story-image-title">Foto Our Story</h2>
+        {storySrc ? (
+          <div className="photo-card" style={{ maxWidth: 420 }}>
+            <AdminImage src={storySrc} alt={story.image_alt} size={420} />
+            <ActionForm action={removeStoryImage} confirm="Hapus foto Our Story?" label="Hapus foto Our Story">
+              <SubmitButton small variant="btn-quiet">
+                Hapus foto
+              </SubmitButton>
+            </ActionForm>
+          </div>
+        ) : (
+          <p className="soft">Belum ada foto. Beranda dan halaman Our Story menampilkan pelat &ldquo;Foto menyusul&rdquo;.</p>
+        )}
+        <PhotoUploader folder="site/story" attach={attachStoryImage} multiple={false} label="Unggah foto Our Story" />
+      </section>
+
       <ActionForm action={saveSetting.bind(null, 'story')} className="admin-form" label="Cerita">
         <fieldset>
           <legend>Our Story</legend>
           <Text id="story.title" label="Judul" value={story.title} required maxLength={80} />
           <Area id="story.body" label="Cerita" value={story.body} rows={12} max={12000} hint="Pisahkan paragraf dengan baris kosong. Tulis hanya yang benar terjadi." />
           <Text id="story.signature" label="Tanda tangan" value={story.signature} maxLength={120} />
+          <Text id="story.image_alt" label="Deskripsi foto Our Story" value={story.image_alt} maxLength={300} />
         </fieldset>
         <div>
           <SubmitButton variant="btn-primary">Simpan cerita</SubmitButton>
@@ -170,6 +199,25 @@ export default async function AdminSettingsPage() {
           <SubmitButton variant="btn-primary">Simpan SEO</SubmitButton>
         </div>
       </ActionForm>
+
+      <section className="admin-section" aria-labelledby="og-image-title">
+        <h2 id="og-image-title">Gambar share</h2>
+        <p className="soft">
+          Gambar yang muncul saat link situs dibagikan di WhatsApp, Instagram, dan Facebook. Disarankan landscape, sekitar
+          1200 x 630. Tanpa gambar, situs memakai logo GeckoDan.
+        </p>
+        {ogSrc ? (
+          <div className="photo-card" style={{ maxWidth: 420 }}>
+            <AdminImage src={ogSrc} alt="Gambar share" size={420} />
+            <ActionForm action={removeOgImage} confirm="Hapus gambar share?" label="Hapus gambar share">
+              <SubmitButton small variant="btn-quiet">
+                Hapus gambar
+              </SubmitButton>
+            </ActionForm>
+          </div>
+        ) : null}
+        <PhotoUploader folder="site/og" attach={attachOgImage} multiple={false} withAlt={false} label="Unggah gambar share" />
+      </section>
     </div>
   )
 }

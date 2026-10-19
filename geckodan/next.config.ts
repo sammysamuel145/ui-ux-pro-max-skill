@@ -24,11 +24,6 @@ const nextConfig: NextConfig = {
         ]
       : [],
   },
-  experimental: {
-    // Photo uploads go through Server Actions; files are capped at 8 MB in the app.
-    serverActions: { bodySizeLimit: '9mb' },
-    proxyClientMaxBodySize: '9mb',
-  },
   async headers() {
     return [
       {
