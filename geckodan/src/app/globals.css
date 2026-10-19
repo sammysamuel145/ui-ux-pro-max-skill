@@ -473,22 +473,21 @@ textarea {
   position: relative;
 }
 
-.menu > summary {
+.menu__button {
   display: inline-flex;
   align-items: center;
   gap: 12px;
   min-height: 48px;
   padding: 8px 4px 8px 12px;
   cursor: pointer;
-  list-style: none;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
   font-size: 0.875rem;
   font-weight: 500;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-}
-
-.menu > summary::-webkit-details-marker {
-  display: none;
 }
 
 .menu__icon {
@@ -504,58 +503,99 @@ textarea {
   transition: transform 200ms var(--ease-out), opacity 150ms ease;
 }
 
-.menu[open] .menu__icon span:nth-child(1) {
+.menu[data-open='true'] .menu__icon span:nth-child(1) {
   transform: translateY(8px) rotate(45deg);
 }
-.menu[open] .menu__icon span:nth-child(2) {
+.menu[data-open='true'] .menu__icon span:nth-child(2) {
   opacity: 0;
 }
-.menu[open] .menu__icon span:nth-child(3) {
+.menu[data-open='true'] .menu__icon span:nth-child(3) {
   transform: translateY(-8px) rotate(-45deg);
 }
 
+/* A compact rounded card that scrolls inside itself, so it never covers the page on a phone. */
 .menu__panel {
   position: absolute;
   right: 0;
   top: calc(100% + 8px);
-  width: min(360px, calc(100vw - 2 * var(--margin)));
-  padding: 24px;
+  width: min(248px, calc(100vw - 2 * var(--margin)));
+  max-height: calc(100vh - var(--header-h) - 24px);
+  max-height: calc(100dvh - var(--header-h) - 24px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 10px;
+  border-radius: 20px;
   background: var(--night);
   color: var(--on-night);
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35); /* taste-skill-ignore: overlay menu */
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35); /* taste-skill-ignore: overlay menu */
+  transform-origin: top right;
+  visibility: hidden;
+  opacity: 0;
+  transform: translateY(-6px) scale(0.96);
+  /* On the way out the card fades first, then leaves the tab order. */
+  transition:
+    opacity 140ms ease,
+    transform 140ms var(--ease-out),
+    visibility 0s linear 140ms;
 }
 
-.menu:not([open]) .menu__panel {
-  display: none;
+.menu[data-open='true'] .menu__panel {
+  visibility: visible;
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 180ms ease,
+    transform 220ms var(--ease-out),
+    visibility 0s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .menu__panel,
+  .menu[data-open='true'] .menu__panel {
+    transform: none;
+    transition: opacity 100ms linear, visibility 0s;
+  }
 }
 
 .menu__panel ul {
   display: grid;
-  gap: 2px;
+  gap: 0;
 }
 
-.menu__panel a {
+.menu__panel li a {
   display: block;
-  padding: 10px 0;
+  padding: 9px 14px;
+  border-radius: 12px;
   font-family: var(--font-display);
-  font-size: 1.5rem;
+  font-size: 1.125rem;
   text-decoration: none;
+  transition: background-color 150ms ease;
 }
 
-.menu__panel a[aria-current='page'] {
+@media (hover: hover) and (pointer: fine) {
+  .menu__panel li a:hover {
+    background: rgba(255, 255, 255, 0.07);
+  }
+}
+
+.menu__panel li a[aria-current='page'] {
   color: var(--orange);
 }
 
 .menu__panel .menu__wa {
-  margin-top: 16px;
+  margin-top: 8px;
   width: 100%;
+  padding-inline: 12px;
+  border-radius: 12px;
+  letter-spacing: 0.12em;
+  white-space: nowrap;
 }
 
 @media (min-width: 1000px) {
   .nav-primary {
     display: flex;
   }
-  .menu > summary .menu__label {
+  .menu__button .menu__label {
     display: none;
   }
 }

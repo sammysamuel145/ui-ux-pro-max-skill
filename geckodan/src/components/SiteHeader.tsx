@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { siteUrl } from '@/lib/env'
 import { pageInquiryMessage, whatsappLink } from '@/lib/whatsapp'
 
@@ -35,23 +35,32 @@ function isCurrent(pathname: string, href: string) {
 export function SiteHeader({ whatsappNumber }: { whatsappNumber: string }) {
   const pathname = usePathname() ?? '/'
   const overlay = pathname === '/'
-  const menuRef = useRef<HTMLDetailsElement>(null)
+  const menuRef = useRef<HTMLDivElement>(null)
+  const [open, setOpen] = useState(false)
 
-  // Close the menu after navigating, and on Escape.
+  // Close the menu after navigating.
   useEffect(() => {
-    if (menuRef.current) menuRef.current.open = false
+    setOpen(false)
   }, [pathname])
 
+  // Close on Escape (focus returns to the button) and on a tap or click outside.
   useEffect(() => {
+    if (!open) return
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && menuRef.current?.open) {
-        menuRef.current.open = false
-        menuRef.current.querySelector('summary')?.focus()
-      }
+      if (e.key !== 'Escape') return
+      setOpen(false)
+      menuRef.current?.querySelector('button')?.focus()
+    }
+    const onPointer = (e: PointerEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) setOpen(false)
     }
     window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [])
+    window.addEventListener('pointerdown', onPointer)
+    return () => {
+      window.removeEventListener('keydown', onKey)
+      window.removeEventListener('pointerdown', onPointer)
+    }
+  }, [open])
 
   return (
     <header className={`site-header${overlay ? ' is-overlay on-night' : ''}`}>
@@ -67,16 +76,30 @@ export function SiteHeader({ whatsappNumber }: { whatsappNumber: string }) {
             </Link>
           ))}
         </nav>
-        <details className="menu" ref={menuRef}>
-          <summary aria-label="Full menu">
+        <div className="menu" ref={menuRef} data-open={open}>
+          <button
+            type="button"
+            className="menu__button"
+            aria-label="Full menu"
+            aria-expanded={open}
+            aria-controls="site-menu"
+            onClick={() => setOpen((v) => !v)}
+          >
             <span className="menu__label">Menu</span>
             <span className="menu__icon" aria-hidden="true">
               <span />
               <span />
               <span />
             </span>
-          </summary>
-          <div className="menu__panel on-night">
+          </button>
+          <div
+            className="menu__panel on-night"
+            id="site-menu"
+            // Any link closes the menu, including a link to the page that is already open.
+            onClick={(e) => {
+              if ((e.target as HTMLElement).closest('a')) setOpen(false)
+            }}
+          >
             <nav aria-label="All pages">
               <ul>
                 {ALL.map((item) => (
@@ -97,7 +120,7 @@ export function SiteHeader({ whatsappNumber }: { whatsappNumber: string }) {
               Ask on WhatsApp
             </a>
           </div>
-        </details>
+        </div>
       </div>
     </header>
   )
