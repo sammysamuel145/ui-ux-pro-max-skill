@@ -3,7 +3,7 @@ import { ErrorNotice, PendingContent, UnconfiguredNotice } from '@/components/No
 import { PageHead } from '@/components/PageHead'
 import { getSettings, listFaqs } from '@/lib/data/public'
 import { paragraphs } from '@/lib/text'
-import { generalInquiryMessage, whatsappLink } from '@/lib/whatsapp'
+import { faqInquiryMessage, whatsappLink } from '@/lib/whatsapp'
 import type { Faq } from '@/lib/types'
 
 export const revalidate = 60
@@ -63,7 +63,7 @@ export default async function FaqPage() {
           <a
             className="btn btn-primary"
             style={{ marginTop: 16 }}
-            href={whatsappLink(settings.business.whatsapp_number, generalInquiryMessage())}
+            href={whatsappLink(settings.business.whatsapp_number, faqInquiryMessage())}
             target="_blank"
             rel="noopener noreferrer"
           >

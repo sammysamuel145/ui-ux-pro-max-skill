@@ -4,7 +4,8 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { useEffect, useRef } from 'react'
-import { whatsappLink, generalInquiryMessage } from '@/lib/whatsapp'
+import { siteUrl } from '@/lib/env'
+import { pageInquiryMessage, whatsappLink } from '@/lib/whatsapp'
 
 const PRIMARY = [
   { href: '/', label: 'Home' },
@@ -89,7 +90,7 @@ export function SiteHeader({ whatsappNumber }: { whatsappNumber: string }) {
             </nav>
             <a
               className="btn btn-primary menu__wa"
-              href={whatsappLink(whatsappNumber, generalInquiryMessage())}
+              href={whatsappLink(whatsappNumber, pageInquiryMessage(pathname, siteUrl()))}
               target="_blank"
               rel="noopener noreferrer"
             >

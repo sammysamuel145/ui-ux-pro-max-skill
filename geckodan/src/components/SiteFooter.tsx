@@ -2,8 +2,8 @@ import Image from 'next/image'
 import Link from 'next/link'
 import type { SiteSettings } from '@/lib/types'
 import { formatWhatsappDisplay } from '@/lib/phone'
-import { generalInquiryMessage, whatsappLink } from '@/lib/whatsapp'
 import { BrandIcon } from './Icons'
+import { ContextWhatsAppLink } from './ContextWhatsAppLink'
 import { activePlatforms } from './SocialLinks'
 
 const NAV = [
@@ -49,14 +49,9 @@ export function SiteFooter({ settings }: { settings: SiteSettings }) {
           <h2>Contact</h2>
           <ul>
             <li>
-              <a
-                href={whatsappLink(business.whatsapp_number, generalInquiryMessage())}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={`Chat with GeckoDan on WhatsApp, ${phone}`}
-              >
+              <ContextWhatsAppLink number={business.whatsapp_number} aria-label={`Chat with GeckoDan on WhatsApp, ${phone}`}>
                 <BrandIcon name="whatsapp" /> {phone}
-              </a>
+              </ContextWhatsAppLink>
             </li>
             <li>
               <Link href="/shipping">Shipping</Link>

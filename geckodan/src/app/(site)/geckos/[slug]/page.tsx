@@ -11,7 +11,7 @@ import { siteUrl } from '@/lib/env'
 import { SEX_LABEL, STATUS_HINT, VISIBILITY_LABEL } from '@/lib/labels'
 import { mediaUrl } from '@/lib/media'
 import { excerpt, formatDate, paragraphs } from '@/lib/text'
-import { geckoInquiryMessage, whatsappLink } from '@/lib/whatsapp'
+import { geckoInquiryMessage, similarInquiryMessage, whatsappLink } from '@/lib/whatsapp'
 
 export const revalidate = 60
 
@@ -180,7 +180,7 @@ export default async function GeckoPage({ params }: Props) {
                 className="btn btn-dark"
                 href={whatsappLink(
                   settings.business.whatsapp_number,
-                  `Hello GeckoDan, I saw ${g.name} (ID: ${g.code}). Do you have a similar gecko available? Link: ${detailUrl}`,
+                  similarInquiryMessage({ name: g.name, code: g.code, url: detailUrl }, forSale ? 'sold' : 'collection'),
                 )}
                 target="_blank"
                 rel="noopener noreferrer"

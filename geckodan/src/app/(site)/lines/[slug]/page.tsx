@@ -4,10 +4,13 @@ import { notFound } from 'next/navigation'
 import { GeckoCard } from '@/components/GeckoCard'
 import { ErrorNotice, PendingContent, UnconfiguredNotice } from '@/components/Notices'
 import { PageHead } from '@/components/PageHead'
-import { getLine, listGeckos } from '@/lib/data/public'
+import { BrandIcon } from '@/components/Icons'
+import { getLine, getSettings, listGeckos } from '@/lib/data/public'
+import { siteUrl } from '@/lib/env'
 import { parseCatalogFilters } from '@/lib/catalog'
 import { mediaUrl } from '@/lib/media'
 import { excerpt, paragraphs } from '@/lib/text'
+import { lineInquiryMessage, whatsappLink } from '@/lib/whatsapp'
 
 export const revalidate = 60
 
@@ -53,7 +56,12 @@ export default async function LinePage({ params }: Props) {
   const cover = mediaUrl(line.cover_photo_path)
   const body = paragraphs(line.description)
   const filters = { ...parseCatalogFilters({}), line: line.slug, status: 'all' as const }
-  const [forSale, showcase] = await Promise.all([listGeckos('for_sale', filters), listGeckos('showcase', filters)])
+  const [forSale, showcase, settings] = await Promise.all([
+    listGeckos('for_sale', filters),
+    listGeckos('showcase', filters),
+    getSettings(),
+  ])
+  const lineMessage = lineInquiryMessage(line.name, `${siteUrl()}/lines/${line.slug}`)
   const geckos = [
     ...(forSale.state === 'ok' ? forSale.data : []),
     ...(showcase.state === 'ok' ? showcase.data.filter((s) => s.visibility === 'showcase') : []),
@@ -83,6 +91,11 @@ export default async function LinePage({ params }: Props) {
           <h2 className="headline" style={{ textTransform: 'uppercase' }}>
             {line.name} geckos
           </h2>
+          <p style={{ marginTop: 20 }}>
+            <a className="btn btn-primary" href={whatsappLink(settings.business.whatsapp_number, lineMessage)} target="_blank" rel="noopener noreferrer">
+              <BrandIcon name="whatsapp" /> Ask about {line.name} on WhatsApp
+            </a>
+          </p>
           <div style={{ marginTop: 32 }}>
             {geckos.length ? (
               <div className="gecko-grid">

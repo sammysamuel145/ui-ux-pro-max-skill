@@ -3,7 +3,7 @@ import { PendingContent } from '@/components/Notices'
 import { PageHead } from '@/components/PageHead'
 import { getSettings, listFaqs } from '@/lib/data/public'
 import { paragraphs } from '@/lib/text'
-import { whatsappLink } from '@/lib/whatsapp'
+import { shippingInquiryMessage, whatsappLink } from '@/lib/whatsapp'
 
 export const revalidate = 60
 
@@ -47,7 +47,7 @@ export default async function ShippingPage() {
         <p>
           <a
             className="btn btn-primary"
-            href={whatsappLink(settings.business.whatsapp_number, 'Hello GeckoDan, I would like to ask about shipping a gecko.')}
+            href={whatsappLink(settings.business.whatsapp_number, shippingInquiryMessage())}
             target="_blank"
             rel="noopener noreferrer"
           >

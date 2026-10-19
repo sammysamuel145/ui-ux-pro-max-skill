@@ -21,7 +21,7 @@ import {
 import { siteUrl } from '@/lib/env'
 import { mediaUrl } from '@/lib/media'
 import { excerpt, paragraphs } from '@/lib/text'
-import { generalInquiryMessage, geckoInquiryMessage, whatsappLink } from '@/lib/whatsapp'
+import { geckoInquiryMessage, stockInquiryMessage, whatsappLink } from '@/lib/whatsapp'
 import './home.css'
 
 export const revalidate = 60
@@ -119,7 +119,7 @@ export default async function HomePage() {
                 <PhotoSlot label="Available gecko" />
                 <p>
                   No geckos are published in the catalog yet. Ask about current stock on WhatsApp.
-                  <a className="btn btn-primary btn-sm" href={whatsappLink(wa, generalInquiryMessage())} target="_blank" rel="noopener noreferrer">
+                  <a className="btn btn-primary btn-sm" href={whatsappLink(wa, stockInquiryMessage())} target="_blank" rel="noopener noreferrer">
                     Ask about stock <BrandIcon name="whatsapp" />
                   </a>
                 </p>

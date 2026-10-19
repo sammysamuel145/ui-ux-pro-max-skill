@@ -5,7 +5,7 @@ import { EmptyNotice, ErrorNotice, UnconfiguredNotice } from '@/components/Notic
 import { PageHead } from '@/components/PageHead'
 import { hasActiveFilters, parseCatalogFilters } from '@/lib/catalog'
 import { getSettings, listGeckos, listLines } from '@/lib/data/public'
-import { generalInquiryMessage, whatsappLink } from '@/lib/whatsapp'
+import { stockInquiryMessage, whatsappLink } from '@/lib/whatsapp'
 
 export const metadata: Metadata = {
   title: 'Geckos',
@@ -20,13 +20,18 @@ export default async function GeckosPage({ searchParams }: Props) {
   const [result, lines, settings] = await Promise.all([listGeckos('for_sale', filters), listLines(), getSettings()])
   const lineOptions = lines.state === 'ok' ? lines.data : []
   const active = hasActiveFilters(filters)
+  const stockMessage = stockInquiryMessage({
+    line: lineOptions.find((l) => l.slug === filters.line)?.name ?? null,
+    sex: filters.sex,
+    q: filters.q,
+  })
 
   return (
     <>
       <PageHead
         title="Our Geckos"
         tagline="A Legacy in Every Line."
-        action={{ label: 'Ask about stock', href: whatsappLink(settings.business.whatsapp_number, generalInquiryMessage()), external: true }}
+        action={{ label: 'Ask about stock', href: whatsappLink(settings.business.whatsapp_number, stockMessage), external: true }}
       >
         <p className="lead">Geckos available for purchase. Prices are not shown: ask directly on WhatsApp.</p>
       </PageHead>
@@ -96,7 +101,7 @@ export default async function GeckosPage({ searchParams }: Props) {
             action={
               <a
                 className="btn btn-primary"
-                href={whatsappLink(settings.business.whatsapp_number, generalInquiryMessage())}
+                href={whatsappLink(settings.business.whatsapp_number, stockMessage)}
                 target="_blank"
                 rel="noopener noreferrer"
               >
