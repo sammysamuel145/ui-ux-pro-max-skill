@@ -72,7 +72,7 @@ export default async function HomePage() {
               <h2 id="lines-title" className="display-3">
                 Signature Lines
               </h2>
-              <p className="lines__title">Three distinct bloodlines, one standard.</p>
+              <p className="lines__title">Distinct bloodlines, one standard.</p>
             </header>
             {lines.state === 'ok' ? (
               <LineIndex

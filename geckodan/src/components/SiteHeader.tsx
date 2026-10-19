@@ -15,11 +15,7 @@ const PRIMARY = [
   { href: '/contact', label: 'Contact' },
 ]
 
-const ALL = [
-  ...PRIMARY.slice(0, 3),
-  { href: '/lines/mantra', label: 'MANTRA' },
-  { href: '/lines/kafka', label: 'KAFKA' },
-  { href: '/lines/valkrie', label: 'VALKRIE' },
+const AFTER_LINES = [
   { href: '/our-story', label: 'Our Story' },
   { href: '/achievements', label: 'Achievements' },
   { href: '/reviews', label: 'Reviews' },
@@ -28,11 +24,15 @@ const ALL = [
   { href: '/contact', label: 'Contact' },
 ]
 
+export type MenuLine = { slug: string; name: string }
+
 function isCurrent(pathname: string, href: string) {
   return href === '/' ? pathname === '/' : pathname === href || pathname.startsWith(`${href}/`)
 }
 
-export function SiteHeader({ whatsappNumber }: { whatsappNumber: string }) {
+export function SiteHeader({ whatsappNumber, lines }: { whatsappNumber: string; lines: MenuLine[] }) {
+  // The published signature lines come from the database, in the owner's order.
+  const ALL = [...PRIMARY.slice(0, 3), ...lines.map((l) => ({ href: `/lines/${l.slug}`, label: l.name })), ...AFTER_LINES]
   const pathname = usePathname() || '/'
   const menuRef = useRef<HTMLDivElement>(null)
   const [open, setOpen] = useState(false)

@@ -5,7 +5,7 @@ import { GeckoCard } from '@/components/GeckoCard'
 import { ErrorNotice, PendingContent, UnconfiguredNotice } from '@/components/Notices'
 import { PageHead } from '@/components/PageHead'
 import { BrandIcon } from '@/components/Icons'
-import { getLine, getSettings, listGeckos } from '@/lib/data/public'
+import { getLine, getSettings, listGeckos, listLines } from '@/lib/data/public'
 import { siteUrl } from '@/lib/env'
 import { parseCatalogFilters } from '@/lib/catalog'
 import { mediaUrl } from '@/lib/media'
@@ -16,8 +16,10 @@ export const revalidate = 60
 
 type Props = { params: Promise<{ slug: string }> }
 
-export function generateStaticParams() {
-  return [{ slug: 'mantra' }, { slug: 'kafka' }, { slug: 'valkrie' }]
+export async function generateStaticParams() {
+  // Lines added later render on first visit, so a failed lookup only means fewer pages prebuilt.
+  const lines = await listLines()
+  return lines.state === 'ok' ? lines.data.map((l) => ({ slug: l.slug })) : []
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {

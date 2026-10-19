@@ -75,6 +75,7 @@ export const geckoSchema = z
   .refine((g) => /^[a-z0-9]+(-[a-z0-9]+)*$/.test(g.slug), { message: 'Slug tidak valid', path: ['slug'] })
 
 export const lineSchema = z.object({
+  name: requiredText(80, 'Nama'),
   tagline: optionalText(200),
   description: optionalText(8000),
   cover_photo_alt: optionalText(300),
@@ -82,6 +83,17 @@ export const lineSchema = z.object({
   seo_title: optionalText(120),
   seo_description: optionalText(300),
 })
+
+export const newLineSchema = z
+  .object({
+    name: requiredText(80, 'Nama'),
+    slug: z.string().trim().max(80).optional().default(''),
+  })
+  .transform((l) => ({ name: l.name, slug: slugify(l.slug || l.name) }))
+  .refine((l) => /^[a-z0-9]+(-[a-z0-9]+)*$/.test(l.slug), {
+    message: 'Alamat halaman tidak valid. Pakai huruf, angka, dan tanda hubung.',
+    path: ['slug'],
+  })
 
 export const awardSchema = z
   .object({
