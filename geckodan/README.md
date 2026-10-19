@@ -116,8 +116,8 @@ The site shows labelled placeholders ("Konten menyusul", "Foto menyusul",
 
 - Real photos of each gecko, and gecko records (ID, morph, sex, hatch date,
   weight, lineage) entered in the dashboard.
-- A real hero photo. Until then the hero uses the approved concept image, with
-  the caption "Ilustrasi konsep, bukan foto hewan GeckoDan."
+- The hero image. Until a photo is uploaded in the dashboard, the hero uses the
+  bundled image supplied by the owner.
 - Cover photos and stories for MANTRA, KAFKA and VALKRIE.
 - The breeder story (Pengaturan situs > Our Story) and approved wording for the
   "about 10 years" experience.

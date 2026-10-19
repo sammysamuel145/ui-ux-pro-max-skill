@@ -124,7 +124,6 @@ export type HeroSettings = {
   cta_href: string
   image_path: string
   image_alt: string
-  image_is_concept: boolean
 }
 
 export type StorySettings = { title: string; body: string; signature: string; image_path: string; image_alt: string }

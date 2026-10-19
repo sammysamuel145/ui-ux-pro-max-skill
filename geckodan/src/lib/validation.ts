@@ -160,7 +160,6 @@ export const heroSchema = z.object({
     .max(200)
     .refine((v) => /^\/(?!\/)[a-z0-9\-/?=&]*$/i.test(v), 'Gunakan tautan internal, contoh /geckos'),
   image_alt: z.string().trim().max(300),
-  image_is_concept: checkbox,
 })
 
 export const storySchema = z.object({

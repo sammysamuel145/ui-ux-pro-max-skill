@@ -225,10 +225,9 @@ try {
     await v.locator(sel).first().scrollIntoViewIfNeeded().catch(() => undefined)
     await v.waitForFunction((q) => [...document.querySelectorAll(q)].every((e) => e.complete), sel, { timeout: 20000 }).catch(() => undefined)
     const info = await v.locator(sel).evaluateAll((els) => els.map((e) => ({ src: e.currentSrc || e.src, ok: e.complete && e.naturalWidth > 0, alt: e.alt })))
-    const caption = await v.locator('.hero__caption').count()
     const og = await v.locator('meta[property="og:image"]').first().getAttribute('content')
     await v.close()
-    return { info, caption, og }
+    return { info, og }
   }
   const ctx2 = await browser.newContext()
 
@@ -254,18 +253,18 @@ try {
   await sec('hero-image-title').getByRole('button', { name: 'Upload' }).click()
   await sec('hero-image-title').getByText('1 file tersimpan.').waitFor({ timeout: 30000 })
   h = await homeImgs('.hero__media img')
-  check('an uploaded hero photo replaces the concept image and drops its caption', h.info.length === 1 && /storage/.test(decodeURIComponent(h.info[0].src)) && h.caption === 0, `caption=${h.caption}`)
+  check('an uploaded hero photo replaces the bundled hero image', h.info.length === 1 && /storage/.test(decodeURIComponent(h.info[0].src)))
 
   // Removing each one restores the placeholder, and the old files are deleted.
   page.on('dialog', (d) => d.accept())
-  await sec('hero-image-title').getByRole('button', { name: 'Kembali ke ilustrasi konsep' }).click()
+  await sec('hero-image-title').getByRole('button', { name: 'Kembali ke gambar bawaan' }).click()
   await sec('hero-image-title').locator('.photo-card').waitFor({ state: 'detached', timeout: 15000 })
   await sec('story-image-title').getByRole('button', { name: 'Hapus foto' }).click()
   await sec('story-image-title').locator('.photo-card').waitFor({ state: 'detached', timeout: 15000 })
   await sec('og-image-title').getByRole('button', { name: 'Hapus gambar' }).click()
   await sec('og-image-title').locator('.photo-card').waitFor({ state: 'detached', timeout: 15000 })
   h = await homeImgs('.story__photo img')
-  check('after removal the story photo, hero caption and og:image return to their defaults', h.info.every((i) => !/site\/story/.test(decodeURIComponent(i.src))) && h.caption === 1 && /geckodan-logo/.test(decodeURIComponent(h.og ?? '')), JSON.stringify({ srcs: h.info.map((i) => i.src), caption: h.caption, og: h.og }))
+  check('after removal the story photo and og:image return to their defaults', h.info.every((i) => !/site\/story/.test(decodeURIComponent(i.src))) && /geckodan-logo/.test(decodeURIComponent(h.og ?? '')), JSON.stringify({ srcs: h.info.map((i) => i.src), og: h.og }))
   const left = []
   for (const folder of ['site/hero', 'site/story', 'site/og']) left.push(...((await service.storage.from('media').list(folder)).data ?? []).filter((o) => o.name !== '.emptyFolderPlaceholder'))
   check('the removed site pictures are deleted from Storage', left.length === 0, left.map((o) => o.name).join(','))
